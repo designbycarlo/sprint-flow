@@ -16,14 +16,42 @@ export default async function Home() {
   
   let board = boards?.[0]
   if (!board) {
-     return (
-        <div className={styles.board} style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <div className={styles.column} style={{ textAlign: 'center' }}>
-                <h2 className={styles.columnTitle}>Setting up your board...</h2>
-                <p className={styles.cardDescription}>Please refresh in a moment. The database trigger is creating your default board.</p>
+    // Manually create the default board and columns if the trigger failed
+    const { data: newBoard, error: boardError } = await supabase.from('boards').insert({ user_id: user.id, title: 'My Sprint Board' }).select().single()
+    
+    if (boardError || !newBoard) {
+        console.error("Failed to create board:", boardError)
+        return (
+            <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>
+                <h2>Database Error</h2>
+                <p>Failed to set up your board.</p>
+                <code>{boardError?.message || "Unknown error"}</code>
             </div>
-        </div>
-     )
+        )
+    }
+
+    board = newBoard
+
+    // Create Columns
+    const { data: cols } = await supabase.from('columns').insert([
+        { board_id: board.id, title: 'To Do', position_index: 0 },
+        { board_id: board.id, title: 'In Progress', position_index: 1 },
+        { board_id: board.id, title: 'Done', position_index: 2 }
+    ]).select()
+
+    if (cols && cols.length === 3) {
+        // Create Sample Cards
+        const todoId = cols.find(c => c.title === 'To Do')?.id
+        const inProgressId = cols.find(c => c.title === 'In Progress')?.id
+        
+        if (todoId && inProgressId) {
+            await supabase.from('cards').insert([
+                { column_id: todoId, title: 'Design System', description: 'Create color palette and typography', position_index: 0 },
+                { column_id: todoId, title: 'Database Schema', description: 'Plan out PostgreSQL tables', position_index: 1 },
+                { column_id: inProgressId, title: 'Authentication', description: 'Implement Supabase login', position_index: 0 }
+            ])
+        }
+    }
   }
 
   const { data: columns } = await supabase.from('columns').select('*').eq('board_id', board.id).order('position_index', { ascending: true })

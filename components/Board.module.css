@@ -66,7 +66,7 @@
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
   cursor: grab;
   border: 1px solid rgba(0, 0, 0, 0.02);
 }
@@ -97,9 +97,10 @@
 
 .dragging {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
-  transform: scale(1.05) !important;
   z-index: 100;
   opacity: 0.9;
+  /* Disable transform transition so it doesn't fight the mouse movements */
+  transition: box-shadow 0.2s ease !important;
 }
 
 .draggingOver {

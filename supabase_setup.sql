@@ -1,3 +1,8 @@
+-- Clean up any existing broken tables so we can start fresh
+DROP TABLE IF EXISTS public.cards CASCADE;
+DROP TABLE IF EXISTS public.columns CASCADE;
+DROP TABLE IF EXISTS public.boards CASCADE;
+
 -- Create tables
 CREATE TABLE public.boards (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
