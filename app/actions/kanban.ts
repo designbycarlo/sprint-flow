@@ -18,7 +18,8 @@ export async function updateCardPosition(cardId: string, newColumnId: string, ne
     throw new Error("Failed to update card position in Supabase")
   }
 
-  // Let Next.js know the data changed
-  revalidatePath('/')
+  // Note: We don't revalidatePath here because the client already has
+  // the updated state from the optimistic update. Revalidating would
+  // cause the page to re-fetch and reset the client state.
   return { success: true }
 }

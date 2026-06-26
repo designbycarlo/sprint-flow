@@ -7,6 +7,13 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #1a202c;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.board.dark {
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  color: #f7fafc;
 }
 
 .column {
@@ -21,6 +28,13 @@
   padding: 20px;
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.board.dark .column {
+  background: rgba(45, 55, 72, 0.6);
+  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .columnHeader {
@@ -29,11 +43,20 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.board.dark .columnHeader {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .columnTitle {
   font-size: 1.125rem;
   font-weight: 600;
   color: #1a202c;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.board.dark .columnTitle {
+  color: #f7fafc;
 }
 
 .columnBody {
@@ -61,24 +84,43 @@
   color: #2d3748;
 }
 
+.board.dark .addCardBtn {
+  color: #e2e8f0;
+  border-color: #4a5568;
+}
+
+.board.dark .addCardBtn:hover {
+  background: rgba(45, 55, 72, 0.8);
+  border-color: #a0aec0;
+  color: #f7fafc;
+}
+
 .card {
   background: #ffffff;
   border-radius: 12px;
   padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-  transition: box-shadow 0.2s ease;
   cursor: grab;
   border: 1px solid rgba(0, 0, 0, 0.02);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: all 0.3s ease;
+}
+
+.board.dark .card {
+  background: #2d3748;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .card:hover {
-  transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
 .card:active {
   cursor: grabbing;
-  transform: scale(0.98);
 }
 
 .cardTitle {
@@ -86,6 +128,11 @@
   font-weight: 500;
   color: #2d3748;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.board.dark .cardTitle {
+  color: #e2e8f0;
 }
 
 .cardDescription {
@@ -93,20 +140,26 @@
   color: #718096;
   margin: 8px 0 0 0;
   line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.board.dark .cardDescription {
+  color: #a0aec0;
 }
 
 .dragging {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important;
-  z-index: 100;
-  opacity: 0.9;
-  /* Disable transform transition so it doesn't fight the mouse movements */
-  transition: box-shadow 0.2s ease !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  opacity: 0.5;
 }
 
 .draggingOver {
   background: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
   min-height: 50px;
+}
+
+.board.dark .draggingOver {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .toast {
@@ -139,4 +192,40 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.themeToggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.board.dark .themeToggle {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #f7fafc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.themeToggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.themeToggle:active {
+  transform: translateY(0);
 }

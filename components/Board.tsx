@@ -4,11 +4,12 @@ import styles from './Board.module.css';
 
 interface BoardProps {
   children: ReactNode;
+  className?: string;
 }
 
-export function Board({ children }: BoardProps) {
+export function Board({ children, className }: BoardProps) {
   return (
-    <div className={styles.board}>
+    <div className={`${styles.board} ${className || ''}`}>
       {children}
     </div>
   );
