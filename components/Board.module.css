@@ -11,7 +11,7 @@
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.board.dark {
+[data-theme="dark"] .board {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
   color: #f7fafc;
 }
@@ -31,7 +31,7 @@
   transition: all 0.3s ease;
 }
 
-.board.dark .column {
+[data-theme="dark"] .column {
   background: rgba(45, 55, 72, 0.6);
   box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -43,7 +43,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.board.dark .columnHeader {
+[data-theme="dark"] .columnHeader {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -55,7 +55,7 @@
   transition: color 0.3s ease;
 }
 
-.board.dark .columnTitle {
+[data-theme="dark"] .columnTitle {
   color: #f7fafc;
 }
 
@@ -84,12 +84,12 @@
   color: #2d3748;
 }
 
-.board.dark .addCardBtn {
+[data-theme="dark"] .addCardBtn {
   color: #e2e8f0;
   border-color: #4a5568;
 }
 
-.board.dark .addCardBtn:hover {
+[data-theme="dark"] .addCardBtn:hover {
   background: rgba(45, 55, 72, 0.8);
   border-color: #a0aec0;
   color: #f7fafc;
@@ -108,7 +108,7 @@
   transition: all 0.3s ease;
 }
 
-.board.dark .card {
+[data-theme="dark"] .card {
   background: #2d3748;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -131,7 +131,7 @@
   transition: color 0.3s ease;
 }
 
-.board.dark .cardTitle {
+[data-theme="dark"] .cardTitle {
   color: #e2e8f0;
 }
 
@@ -143,7 +143,7 @@
   transition: color 0.3s ease;
 }
 
-.board.dark .cardDescription {
+[data-theme="dark"] .cardDescription {
   color: #a0aec0;
 }
 
@@ -158,7 +158,7 @@
   min-height: 50px;
 }
 
-.board.dark .draggingOver {
+[data-theme="dark"] .draggingOver {
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -196,36 +196,36 @@
 
 .themeToggle {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   right: 20px;
   z-index: 1000;
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 10px 16px;
+  width: 48px;
+  height: 48px;
+  background: #4a5568;
+  border: none;
+  border-radius: 50%;
+  padding: 0;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #2d3748;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  font-size: 20px;
+  color: white;
 }
 
-.board.dark .themeToggle {
-  background: #2d3748;
-  border-color: #4a5568;
-  color: #f7fafc;
+[data-theme="dark"] .themeToggle {
+  background: #f7fafc;
+  color: #2d3748;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .themeToggle:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .themeToggle:active {
-  transform: translateY(0);
+  transform: scale(0.95);
 }

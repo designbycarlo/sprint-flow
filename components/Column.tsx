@@ -8,9 +8,16 @@ interface ColumnProps {
   title: string;
   children?: ReactNode;
   onAddCard?: () => void;
+  isAddingCard?: boolean;
+  newCardTitle?: string;
+  newCardDescription?: string;
+  onTitleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDescriptionChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onSubmitCard?: () => void;
+  onCancelAddCard?: () => void;
 }
 
-export function Column({ id, title, children, onAddCard }: ColumnProps) {
+export function Column({ id, title, children, onAddCard, isAddingCard, newCardTitle, newCardDescription, onTitleChange, onDescriptionChange, onSubmitCard, onCancelAddCard }: ColumnProps) {
   const { setNodeRef, isOver } = useDroppable({
     id: id,
   });
@@ -25,8 +32,73 @@ export function Column({ id, title, children, onAddCard }: ColumnProps) {
         ref={setNodeRef}
       >
         {children}
+        {isAddingCard && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <input
+              type="text"
+              placeholder="Card title..."
+              value={newCardTitle}
+              onChange={onTitleChange}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+              }}
+              autoFocus
+            />
+            <textarea
+              placeholder="Description (optional)..."
+              value={newCardDescription}
+              onChange={onDescriptionChange}
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                minHeight: '60px',
+                resize: 'vertical',
+              }}
+            />
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={onCancelAddCard}
+                style={{
+                  padding: '6px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  background: 'white',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onSubmitCard}
+                disabled={!newCardTitle?.trim()}
+                style={{
+                  padding: '6px 12px',
+                  border: 'none',
+                  borderRadius: '6px',
+                  background: '#4a5568',
+                  color: 'white',
+                  cursor: newCardTitle?.trim() ? 'pointer' : 'not-allowed',
+                  fontSize: '13px',
+                  opacity: newCardTitle?.trim() ? 1 : 0.5,
+                }}
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-      {onAddCard && (
+      {onAddCard && !isAddingCard && (
         <button className={styles.addCardBtn} onClick={onAddCard}>
           + Add Card
         </button>

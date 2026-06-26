@@ -3,8 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --btn-bg: white;
+  --btn-text: #333;
+  --btn-border: 1px solid #ccc;
 }
 
+[data-theme="dark"] {
+  --btn-bg: #1f2937;
+  --btn-text: #f3f4f6;
+  --btn-border: 1px solid #4b5563;
+}
+
+/* stylelint-disable-next-line at-rule-no-unknown */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

@@ -93,7 +93,25 @@ export default async function Home() {
     <main>
       <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 100 }}>
         <form action={signout}>
-          <button className={styles.addCardBtn} style={{ background: 'white', padding: '8px 16px' }}>Log Out</button>
+          <button
+            style={{
+              background: 'var(--btn-bg, white)',
+              color: 'var(--btn-text, #333)',
+              border: 'var(--btn-border, 1px solid #ccc)',
+              padding: '8px 16px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.opacity = '0.8';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
+          >
+            Log Out
+          </button>
         </form>
       </div>
       <KanbanContainer initialData={initialData} />

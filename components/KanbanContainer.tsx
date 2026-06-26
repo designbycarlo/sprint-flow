@@ -19,7 +19,7 @@ import { Column } from './Column';
 import { Card } from './Card';
 import { ThemeToggle } from './ThemeToggle';
 import styles from './Board.module.css';
-import { updateCardPosition } from '@/app/actions/kanban';
+import { updateCardPosition, addCard, deleteCard, updateCard } from '@/app/actions/kanban';
 
 export type CardData = {
   id: string;
@@ -44,6 +44,9 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
   const [isMounted, setIsMounted] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{message: string, type: 'error' | 'success'} | null>(null);
+  const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
+  const [newCardTitle, setNewCardTitle] = useState('');
+  const [newCardDescription, setNewCardDescription] = useState('');
 
   useEffect(() => {
     setIsMounted(true);
@@ -52,6 +55,101 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
   const showToast = (message: string, type: 'error' | 'success') => {
     setToastMessage({ message, type });
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const handleAddCardClick = (columnId: string) => {
+    setAddingToColumn(columnId);
+    setNewCardTitle('');
+    setNewCardDescription('');
+  };
+
+  const handleCancelAddCard = () => {
+    setAddingToColumn(null);
+    setNewCardTitle('');
+    setNewCardDescription('');
+  };
+
+  const handleSubmitNewCard = async (columnId: string) => {
+    if (!newCardTitle.trim()) return;
+
+    try {
+      const result = await addCard(columnId, newCardTitle.trim(), newCardDescription.trim());
+      if (result.success && result.card) {
+        const newCard = result.card;
+        setData({
+          ...data,
+          columns: {
+            ...data.columns,
+            [columnId]: {
+              ...data.columns[columnId],
+              cardIds: [...data.columns[columnId].cardIds, newCard.id]
+            }
+          },
+          cards: {
+            ...data.cards,
+            [newCard.id]: {
+              id: newCard.id,
+              title: newCard.title,
+              description: newCard.description || ''
+            }
+          }
+        });
+        showToast('Card added successfully!', 'success');
+        handleCancelAddCard();
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to add card', 'error');
+    }
+  };
+
+  const handleEditCard = async (cardId: string, title: string, description?: string) => {
+    try {
+      await updateCard(cardId, title, description);
+      setData({
+        ...data,
+        cards: {
+          ...data.cards,
+          [cardId]: {
+            ...data.cards[cardId],
+            title,
+            description: description || ''
+          }
+        }
+      });
+      showToast('Card updated successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to update card', 'error');
+    }
+  };
+
+  const handleDeleteCard = async (cardId: string) => {
+    try {
+      await deleteCard(cardId);
+      // Find which column contains this card
+      const columnId = findColumnByCardId(cardId);
+      if (columnId) {
+        setData({
+          ...data,
+          columns: {
+            ...data.columns,
+            [columnId]: {
+              ...data.columns[columnId],
+              cardIds: data.columns[columnId].cardIds.filter(id => id !== cardId)
+            }
+          },
+          cards: {
+            ...data.cards,
+            [cardId]: undefined as any
+          }
+        });
+      }
+      showToast('Card deleted successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete card', 'error');
+    }
   };
 
   const sensors = useSensors(
@@ -216,7 +314,19 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
             const cards = column.cardIds.map((cardId) => data.cards[cardId]);
 
             return (
-              <Column key={column.id} id={column.id} title={column.title} onAddCard={() => console.log('Add card to', column.id)}>
+              <Column
+                key={column.id}
+                id={column.id}
+                title={column.title}
+                onAddCard={() => handleAddCardClick(column.id)}
+                isAddingCard={addingToColumn === column.id}
+                newCardTitle={newCardTitle}
+                newCardDescription={newCardDescription}
+                onTitleChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewCardTitle(e.target.value)}
+                onDescriptionChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewCardDescription(e.target.value)}
+                onSubmitCard={() => handleSubmitNewCard(column.id)}
+                onCancelAddCard={handleCancelAddCard}
+              >
                 <SortableContext
                   items={column.cardIds}
                   strategy={verticalListSortingStrategy}
@@ -230,6 +340,8 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
                       currentColumnId={column.id}
                       columns={data.columns}
                       onMoveCard={handleMoveCard}
+                      onEditCard={handleEditCard}
+                      onDeleteCard={handleDeleteCard}
                     />
                   ))}
                 </SortableContext>
