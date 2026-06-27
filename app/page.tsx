@@ -1,6 +1,6 @@
 import { KanbanContainer } from '@/components/KanbanContainer'
+import { LogOutButton } from '@/components/LogOutButton'
 import { createClient } from '@/utils/supabase/server'
-import { signout } from '@/app/login/actions'
 import styles from '@/components/Board.module.css'
 
 export default async function Home() {
@@ -92,27 +92,7 @@ export default async function Home() {
   return (
     <main>
       <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 100 }}>
-        <form action={signout}>
-          <button
-            style={{
-              background: 'var(--btn-bg, white)',
-              color: 'var(--btn-text, #333)',
-              border: 'var(--btn-border, 1px solid #ccc)',
-              padding: '8px 16px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.opacity = '0.8';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.opacity = '1';
-            }}
-          >
-            Log Out
-          </button>
-        </form>
+        <LogOutButton />
       </div>
       <KanbanContainer initialData={initialData} />
     </main>
