@@ -192,7 +192,7 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
               }}
               title="Edit"
             >
-              ✏️
+              ✎
             </button>
           )}
           {onDeleteCard && (
@@ -217,7 +217,7 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
               }}
               title="Delete"
             >
-              🗑️
+              ✕
             </button>
           )}
         </div>

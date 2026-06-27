@@ -22,10 +22,30 @@ export function Column({ id, title, children, onAddCard, isAddingCard, newCardTi
     id: id,
   });
 
+  const dotColor =
+    title === 'To Do' ? '#3b82f6' :
+    title === 'In Progress' ? '#ef4444' :
+    title === 'Done' ? '#22c55e' :
+    '#6b7280';
+
   return (
     <div className={styles.column}>
       <div className={styles.columnHeader}>
-        <h3 className={styles.columnTitle}>{title}</h3>
+        <h3 className={styles.columnTitle}>
+          <span
+            style={{
+              display: 'inline-block',
+              width: '10px',
+              height: '10px',
+              borderRadius: '3px',
+              backgroundColor: dotColor,
+              marginRight: '10px',
+              verticalAlign: 'middle',
+              flexShrink: 0,
+            }}
+          />
+          <span style={{ verticalAlign: 'middle' }}>{title}</span>
+        </h3>
       </div>
       <div
         className={`${styles.columnBody} ${isOver ? styles.draggingOver : ''}`}

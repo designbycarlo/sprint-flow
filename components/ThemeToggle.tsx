@@ -47,7 +47,7 @@ export function ThemeToggle() {
       }}
       title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
-      {isDark ? '☀' : '☾'}
+      {isDark ? '☯︎' : '☯︎'}
     </button>
   );
 }
