@@ -1,7 +1,7 @@
+import Image from 'next/image'
 import { KanbanContainer } from '@/components/KanbanContainer'
 import { LogOutButton } from '@/components/LogOutButton'
 import { createClient } from '@/utils/supabase/server'
-import styles from '@/components/Board.module.css'
 
 export default async function Home() {
   const supabase = await createClient()
@@ -91,10 +91,41 @@ export default async function Home() {
 
   return (
     <main>
-      <div style={{ position: 'absolute', top: 16, right: 24, zIndex: 100 }}>
+      {/* Header with logo on left and LogOut on right */}
+      <header
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 28px',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          zIndex: 200,
+          transition: 'background 0.3s ease',
+        }}
+        className="app-header"
+      >
+        <Image
+          src="/sprint-flow-logo.svg"
+          alt="Sprint Flow"
+          width={100}
+          height={50}
+          priority
+        />
         <LogOutButton />
+      </header>
+
+      {/* Push content below fixed header */}
+      <div style={{ paddingTop: '60px' }}>
+        <KanbanContainer initialData={initialData} />
       </div>
-      <KanbanContainer initialData={initialData} />
     </main>
   );
 }

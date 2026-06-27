@@ -15,6 +15,74 @@
 }
 
 
+/* Login buttons */
+.login-btn-primary {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #4a6cf7;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.login-btn-primary:hover {
+  background: #3b5de7;
+}
+
+.login-btn-secondary {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e0;
+  background: transparent;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.login-btn-secondary:hover {
+  background: #f7fafc;
+  border-color: #a0aec0;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f7fafc;
+  color: #1a202c;
+  font-size: 0.95rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+.login-input:focus {
+  border-color: #4a6cf7;
+  background: #ffffff;
+}
+/* Login page input autofill override */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1a202c;
+  -webkit-box-shadow: 0 0 0px 1000px #f7fafc inset;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #1a202c;
+}
+
+/* Fixed header dark mode compatibility */
+[data-theme="dark"] body .app-header,
+[data-theme="dark"] header {
+  background: rgba(26, 32, 44, 0.92) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;

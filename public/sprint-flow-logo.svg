@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283.46 141.73" fill="none">
+  <!-- "sprint" in regular Helvetica-style, dark gray (#333) -->
+  <text
+    x="56.69"
+    y="78"
+    font-family="'Helvetica', 'Inter', Arial, sans-serif"
+    font-size="30"
+    font-weight="400"
+    fill="#333333"
+  >sprint</text>
+  
+  <!-- "flow" in Helvetica-Bold, black -->
+  <text
+    x="133.23"
+    y="78"
+    font-family="'Helvetica', 'Inter', Arial, sans-serif"
+    font-size="30"
+    font-weight="700"
+    fill="#000000"
+  >flow</text>
+  
+  <!-- Red square accent (~ #e64d4d) -->
+  <rect x="223.94" y="93.54" width="11.34" height="11.34" fill="#e64d4d" rx="2"/>
+</svg>

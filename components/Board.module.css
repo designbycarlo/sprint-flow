@@ -194,6 +194,17 @@
   }
 }
 
+/* Header styles */
+header.app-header {
+  transition: background 0.3s ease, border-bottom 0.3s ease !important;
+}
+
+[data-theme="dark"] header.app-header {
+  background: rgba(26, 32, 44, 0.92) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+
 .themeToggle {
   position: fixed;
   bottom: 20px;
