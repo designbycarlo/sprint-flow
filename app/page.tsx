@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import { KanbanContainer } from '@/components/KanbanContainer'
 import { LogOutButton } from '@/components/LogOutButton'
+import { SprintFlowLogo } from '@/components/SprintFlowLogo'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function Home() {
@@ -112,13 +112,7 @@ export default async function Home() {
         }}
         className="app-header"
       >
-        <Image
-          src="/sprint-flow-logo.svg"
-          alt="Sprint Flow"
-          width={120}
-          height={46}
-          priority
-        />
+        <SprintFlowLogo />
         <LogOutButton />
       </header>
 
