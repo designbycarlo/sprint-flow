@@ -259,7 +259,7 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
           }}
           title="Move to column"
         >
-          ⋮
+         ❖
         </button>
 
         {showDropdown && (
