@@ -7,12 +7,13 @@ export function LogOutButton() {
     <form action={signout}>
       <button
         style={{
-          background: "var(--btn-bg, white)",
+          background: "transparent",
           color: "var(--btn-text, #333)",
           border: "var(--btn-border, 1px solid #ccc)",
           padding: "8px 16px",
           borderRadius: "8px",
           cursor: "pointer",
+          fontSize: "13px",
           transition: "all 0.2s ease",
         }}
         onMouseOver={(e) => {
