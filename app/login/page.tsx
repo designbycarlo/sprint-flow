@@ -30,8 +30,8 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
           <Image
             src="/sprint-flow-logo.svg"
             alt="Sprint Flow"
-            width={160}
-            height={80}
+            width={180}
+            height={69}
             priority
             style={{ display: 'inline-block' }}
           />

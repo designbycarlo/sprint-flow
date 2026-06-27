@@ -115,8 +115,8 @@ export default async function Home() {
         <Image
           src="/sprint-flow-logo.svg"
           alt="Sprint Flow"
-          width={100}
-          height={50}
+          width={120}
+          height={46}
           priority
         />
         <LogOutButton />
