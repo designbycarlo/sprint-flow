@@ -1,30 +1,47 @@
-# Sprint Flow
+# <picture><source media="(prefers-color-scheme: dark)" srcset="./public/sprint-flow-logo.svg"/><img alt="Sprint Flow" src="./public/sprint-flow-logo.svg" width="220"/></picture>
 
-Sprint Flow is a streamlined project management application designed to facilitate [describe your main goal, e.g., agile sprint tracking/team productivity]. 
+> **Drag. Drop. Done.** — A Kanban board that keeps your sprint on track.
 
-## 🚀 Features
+## ⚡ Tech Stack
 
-* **[Feature 1]:** Briefly describe a core capability.
-* **[Feature 2]:** Briefly describe another core capability.
-* **Supabase Integration:** Built with a scalable backend for real-time data management.
+| Layer | What We're Using |
+|-------|-----------------|
+| **Framework** | Next.js 16 (App Router, Server Components) |
+| **Language** | TypeScript — strict, no `any` shortcuts |
+| **Database & Auth** | Supabase (PostgreSQL + Row Level Security) |
+| **Drag & Drop** | @dnd-kit — smooth, accessible |
+| **Styling** | CSS Modules + Tailwind, with full dark mode |
 
-## 🛠 Tech Stack
+## 🎯 Features
 
-* **Framework:** [Next.js](https://nextjs.org)
-* **Language:** TypeScript
-* **Database/Auth:** [Supabase](https://supabase.com)
-* **Styling:** Tailwind CSS (implied by typical Next.js setups)
+- **🔄 Drag-and-drop Kanban** — Cards glide between "To Do", "In Progress", and "Done" like butter
+- **🔐 Authentication** — Email/password login powered by Supabase Auth. No Google OAuth bloat.
+- **🌙 Dark mode** — Toggle at the click of a button. Light and dark themes that are easy on the eyes.
+- **🗄️ Persistent data** — Every card and column lives in PostgreSQL with RLS keeping things secure.
+- **⚡ Real-time ready** — Built on Supabase's real-time infrastructure, ready to go live when you are.
 
-## 📦 Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+```bash
+npm install
+cp .env.local.example .env.local   # Drop in your Supabase creds
+npm run dev
+```
 
-* Node.js (v18+)
-* A Supabase account and project
+Open [http://localhost:3000](http://localhost:3000) — you'll land on the login page. Sign up, log in, and start dragging.
 
-### Installation
+## 🔑 Environment Variables
 
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/designbycarlo/sprint-flow.git](https://github.com/designbycarlo/sprint-flow.git)
-   cd sprint-flow
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
+
+## 🌐 Deployment
+
+Deployed on [Vercel](https://vercel.com). Push to `main` → auto-deploys. That's it.
+
+---
+
+*Built with ☕ by [Carlo](https://github.com/designbycarlo)*
+
