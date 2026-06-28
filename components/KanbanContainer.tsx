@@ -338,6 +338,7 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
                       title={card.title}
                       description={card.description}
                       currentColumnId={column.id}
+                      currentColumnTitle={column.title}
                       columns={data.columns}
                       onMoveCard={handleMoveCard}
                       onEditCard={handleEditCard}

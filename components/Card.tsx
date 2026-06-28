@@ -9,13 +9,14 @@ interface CardProps {
   title: string;
   description?: string;
   currentColumnId: string;
+  currentColumnTitle: string;
   columns: Record<string, { id: string; title: string }>;
   onMoveCard: (cardId: string, newColumnId: string) => void;
   onEditCard?: (cardId: string, title: string, description?: string) => void;
   onDeleteCard?: (cardId: string) => void;
 }
 
-export function Card({ id, title, description, currentColumnId, columns, onMoveCard, onEditCard, onDeleteCard }: CardProps) {
+export function Card({ id, title, description, currentColumnId, currentColumnTitle, columns, onMoveCard, onEditCard, onDeleteCard }: CardProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
@@ -31,11 +32,18 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
     isDragging,
   } = useSortable({ id });
 
+  const columnColor =
+    currentColumnTitle === 'To Do' ? '#3b82f6' :
+    currentColumnTitle === 'In Progress' ? '#ef4444' :
+    currentColumnTitle === 'Done' ? '#22c55e' :
+    undefined;
+
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
     zIndex: isDragging ? 1000 : 'auto',
+    borderLeft: columnColor ? `1px solid ${columnColor}` : undefined,
   };
 
   useEffect(() => {
