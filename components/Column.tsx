@@ -87,11 +87,11 @@ export function Column({ id, title, children, onAddCard, isAddingCard, newCardTi
             <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
               <button
                 onClick={onCancelAddCard}
+                className={styles.cancelBtn}
                 style={{
                   padding: '6px 12px',
                   border: '1px solid #e2e8f0',
                   borderRadius: '6px',
-                  background: 'white',
                   cursor: 'pointer',
                   fontSize: '13px',
                 }}

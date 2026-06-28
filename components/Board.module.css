@@ -158,6 +158,7 @@
 
 [data-theme="dark"] .cancelBtn {
   color: #1a202c;
+  background: #f7fafc;
 }
 
 .draggingOver {
