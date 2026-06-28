@@ -129,7 +129,6 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
                 padding: '4px 10px',
                 border: '1px solid #cbd5e0',
                 borderRadius: '4px',
-                background: 'white',
                 cursor: 'pointer',
                 fontSize: '12px',
               }}
