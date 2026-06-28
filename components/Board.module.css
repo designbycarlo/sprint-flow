@@ -152,6 +152,14 @@
   opacity: 0.5;
 }
 
+.cancelBtn {
+  color: inherit;
+}
+
+[data-theme="dark"] .cancelBtn {
+  color: #1a202c;
+}
+
 .draggingOver {
   background: rgba(0, 0, 0, 0.02);
   border-radius: 8px;

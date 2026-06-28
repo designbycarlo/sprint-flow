@@ -124,6 +124,7 @@ export function Card({ id, title, description, currentColumnId, columns, onMoveC
           <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
             <button
               onClick={handleCancelEdit}
+              className={styles.cancelBtn}
               style={{
                 padding: '4px 10px',
                 border: '1px solid #cbd5e0',
