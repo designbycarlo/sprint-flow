@@ -16,6 +16,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SprintFlow",
   description: "Drag. Drop. Done.",
+  manifest: "/manifest.json",
   icons: {
     icon: "/favicon.svg",
     apple: "/app-icon.svg",
