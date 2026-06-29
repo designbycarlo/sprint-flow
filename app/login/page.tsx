@@ -15,17 +15,7 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       }}
     >
-      <form
-        style={{
-          width: '100%',
-          maxWidth: '420px',
-          background: '#ffffff',
-          borderRadius: '20px',
-          padding: '40px 36px',
-          boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15)',
-          border: '1px solid rgba(0, 0, 0, 0.06)',
-        }}
-      >
+      <form className="login-form">
         {/* Logo centered above the title */}
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <Image

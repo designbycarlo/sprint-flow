@@ -15,6 +15,28 @@
 }
 
 
+/* Login form */
+.login-form {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 640px) {
+  .login-form {
+    max-width: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    padding: 40px 24px;
+    border: none;
+    box-shadow: none;
+  }
+}
+
 /* Login buttons */
 .login-btn-primary {
   flex: 1;
