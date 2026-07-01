@@ -17,13 +17,12 @@ interface CardProps {
 }
 
 export function Card({ id, title, description, currentColumnId, currentColumnTitle, columns, onMoveCard, onEditCard, onDeleteCard }: CardProps) {
-  const [showMoveDropdown, setShowMoveDropdown] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editDescription, setEditDescription] = useState(description || '');
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showMoveSubmenu, setShowMoveSubmenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuVisible, setMenuVisible] = useState(false);
 
@@ -69,25 +68,12 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     }
   }, [showMenu]);
 
-  // Close move dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowMoveDropdown(false);
-      }
-    }
-
-    if (showMoveDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showMoveDropdown]);
-
   const handleColumnChange = (newColumnId: string) => {
     if (newColumnId !== currentColumnId) {
       onMoveCard(id, newColumnId);
     }
-    setShowMoveDropdown(false);
+    setShowMenu(false);
+    setShowMoveSubmenu(false);
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -235,6 +221,34 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
               className={styles.cardMenuDropdown}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Move To submenu */}
+              <div
+                className={styles.moveToSubmenu}
+                onMouseEnter={() => setShowMoveSubmenu(true)}
+                onMouseLeave={() => setShowMoveSubmenu(false)}
+              >
+                <button className={`${styles.cardMenuItem} ${styles.moveToTrigger}`}>
+                  <span className={styles.arrowIcon}>›</span>
+                  <span>Move To</span>
+                </button>
+                
+                {showMoveSubmenu && (
+                  <div className={styles.moveToDropdown}>
+                    {Object.entries(columns).map(([columnId, column]) => (
+                      <button
+                        key={columnId}
+                        onClick={() => handleColumnChange(columnId)}
+                        className={`${styles.moveToItem} ${columnId === currentColumnId ? styles.moveToItemActive : ''}`}
+                      >
+                        {column.title}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.menuSeparator}></div>
+
               {onEditCard && (
                 <button
                   onClick={handleEditClick}
@@ -244,6 +258,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                   Edit
                 </button>
               )}
+              
               {onDeleteCard && (
                 <button
                   onClick={handleDeleteClick}
@@ -257,95 +272,6 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
             </div>
           )}
         </div>
-      </div>
-
-      <div style={{ marginTop: '12px', position: 'relative' }} ref={dropdownRef}>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowMoveDropdown(!showMoveDropdown);
-          }}
-          style={{
-            background: showMoveDropdown ? '#edf2f7' : 'transparent',
-            border: '1px solid #cbd5e0',
-            cursor: 'pointer',
-            padding: '4px 10px',
-            fontSize: '12px',
-            color: '#718096',
-            borderRadius: '4px',
-            lineHeight: 1,
-            minWidth: '28px',
-            minHeight: '28px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseOver={(e) => {
-            if (!showMoveDropdown) {
-              e.currentTarget.style.background = '#edf2f7';
-              e.currentTarget.style.borderColor = '#a0aec0';
-            }
-          }}
-          onMouseOut={(e) => {
-            if (!showMoveDropdown) {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.borderColor = '#cbd5e0';
-            }
-          }}
-          title="Move to column"
-        >
-         ❖
-        </button>
-
-        {showMoveDropdown && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: '100%',
-              marginTop: '4px',
-              background: 'white',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              zIndex: 1000,
-              minWidth: '140px',
-              padding: '4px 0',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {Object.entries(columns).map(([columnId, column]) => (
-              <button
-                key={columnId}
-                onClick={() => handleColumnChange(columnId)}
-                style={{
-                  width: '100%',
-                  padding: '8px 14px',
-                  border: 'none',
-                  background: columnId === currentColumnId ? '#edf2f7' : 'white',
-                  color: columnId === currentColumnId ? '#4a5568' : '#2d3748',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  fontSize: '13px',
-                  fontWeight: columnId === currentColumnId ? '600' : 'normal',
-                }}
-                onMouseOver={(e) => {
-                  if (columnId !== currentColumnId) {
-                    e.currentTarget.style.background = '#f7fafc';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (columnId !== currentColumnId) {
-                    e.currentTarget.style.background = 'white';
-                  }
-                }}
-              >
-                {column.title}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
