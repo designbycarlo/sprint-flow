@@ -152,6 +152,122 @@
   opacity: 0.5;
 }
 
+.cardHoverable {
+  position: relative;
+}
+
+.cardMenuContainer {
+  position: relative;
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: width 0.15s ease, opacity 0.15s ease;
+}
+
+.cardMenuVisible {
+  width: 28px;
+  opacity: 1;
+  overflow: visible;
+}
+
+/* Always show on touch devices via class override in component */
+.cardMenuBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  line-height: 1;
+  color: #718096;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.cardMenuBtn:hover {
+  background: #edf2f7 !important;
+}
+
+[data-theme="dark"] .cardMenuBtn {
+  color: #a0aec0;
+}
+
+[data-theme="dark"] .cardMenuBtn:hover {
+  background: #4a5568 !important;
+}
+
+.threeDots {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.cardMenuDropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  z-index: 1000;
+  min-width: 130px;
+  padding: 4px 0;
+  animation: fadeIn 0.12s ease;
+}
+
+[data-theme="dark"] .cardMenuDropdown {
+  background: #2d3748;
+  border: 1px solid #4a5568;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+
+.cardMenuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 14px;
+  border: none;
+  background: white;
+  color: #2d3748;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+  font-family: inherit;
+  transition: background 0.1s ease;
+}
+
+[data-theme="dark"] .cardMenuItem {
+  background: #2d3748;
+  color: #e2e8f0;
+}
+
+.cardMenuItem:hover {
+  background: #f7fafc;
+}
+
+[data-theme="dark"] .cardMenuItem:hover {
+  background: #4a5568;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .cancelBtn {
   color: inherit;
 }
@@ -212,7 +328,6 @@ header.app-header {
   background: #F3F3F4 !important;
   border-bottom: 1px solid #ffffff14 !important;
 }
-
 
 .themeToggle {
   position: fixed;

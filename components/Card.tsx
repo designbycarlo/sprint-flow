@@ -17,12 +17,16 @@ interface CardProps {
 }
 
 export function Card({ id, title, description, currentColumnId, currentColumnTitle, columns, onMoveCard, onEditCard, onDeleteCard }: CardProps) {
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [showMoveDropdown, setShowMoveDropdown] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [editTitle, setEditTitle] = useState(title);
   const [editDescription, setEditDescription] = useState(description || '');
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuVisible, setMenuVisible] = useState(false);
+
   const {
     attributes,
     listeners,
@@ -46,24 +50,44 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     borderLeft: columnColor ? `1px solid ${columnColor}` : undefined,
   };
 
+  // Detect touch device
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // Close menu on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false);
       }
     }
 
-    if (showDropdown) {
+    if (showMenu) {
       document.addEventListener('mousedown', handleClickOutside);
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
-  }, [showDropdown]);
+  }, [showMenu]);
+
+  // Close move dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowMoveDropdown(false);
+      }
+    }
+
+    if (showMoveDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showMoveDropdown]);
 
   const handleColumnChange = (newColumnId: string) => {
     if (newColumnId !== currentColumnId) {
       onMoveCard(id, newColumnId);
     }
-    setShowDropdown(false);
+    setShowMoveDropdown(false);
   };
 
   const handleEditClick = (e: React.MouseEvent) => {
@@ -71,12 +95,12 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     setIsEditing(true);
     setEditTitle(title);
     setEditDescription(description || '');
-    setShowDropdown(false);
+    setShowMenu(false);
   };
 
   const handleDeleteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowDropdown(false);
+    setShowMenu(false);
     if (onDeleteCard && confirm('Are you sure you want to delete this card?')) {
       await onDeleteCard(id);
     }
@@ -171,63 +195,66 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       style={style}
       {...attributes}
       {...listeners}
-      className={`${styles.card} ${isDragging ? styles.dragging : ''}`}
+      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${!isTouchDevice ? styles.cardHoverable : ''}`}
+      onMouseEnter={() => {
+        if (!isTouchDevice) setMenuVisible(true);
+      }}
+      onMouseLeave={() => {
+        if (!isTouchDevice && !showMenu) setMenuVisible(false);
+      }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <h4 className={styles.cardTitle}>{title}</h4>
           {description && <p className={styles.cardDescription}>{description}</p>}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {onEditCard && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEditClick(e);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                fontSize: '16px',
-                lineHeight: 1,
-                color: '#718096',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-              }}
-              title="Edit"
+        {/* 3-dot vertical menu trigger - always visible on touch, visible on hover for desktop */}
+        <div
+          className={`
+            ${styles.cardMenuContainer}
+            ${(isTouchDevice || menuVisible) ? styles.cardMenuVisible : ''}
+          `}
+          ref={menuRef}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMenu(!showMenu);
+            }}
+            className={styles.cardMenuBtn}
+            style={{
+              background: showMenu ? '#edf2f7' : 'transparent',
+            }}
+            title="Card actions"
+          >
+            <span className={styles.threeDots}>⋮</span>
+          </button>
+
+          {showMenu && (
+            <div
+              className={styles.cardMenuDropdown}
+              onClick={(e) => e.stopPropagation()}
             >
-              ✎
-            </button>
-          )}
-          {onDeleteCard && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDeleteClick(e);
-              }}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                fontSize: '16px',
-                lineHeight: 1,
-                color: '#e53e3e',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '24px',
-                height: '24px',
-              }}
-              title="Delete"
-            >
-              ✕
-            </button>
+              {onEditCard && (
+                <button
+                  onClick={handleEditClick}
+                  className={styles.cardMenuItem}
+                >
+                  <span style={{ marginRight: '8px' }}>✎</span>
+                  Edit
+                </button>
+              )}
+              {onDeleteCard && (
+                <button
+                  onClick={handleDeleteClick}
+                  className={styles.cardMenuItem}
+                  style={{ color: '#e53e3e' }}
+                >
+                  <span style={{ marginRight: '8px' }}>✕</span>
+                  Delete
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -236,10 +263,10 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
         <button
           onClick={(e) => {
             e.stopPropagation();
-            setShowDropdown(!showDropdown);
+            setShowMoveDropdown(!showMoveDropdown);
           }}
           style={{
-            background: showDropdown ? '#edf2f7' : 'transparent',
+            background: showMoveDropdown ? '#edf2f7' : 'transparent',
             border: '1px solid #cbd5e0',
             cursor: 'pointer',
             padding: '4px 10px',
@@ -255,13 +282,13 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
             transition: 'all 0.2s ease',
           }}
           onMouseOver={(e) => {
-            if (!showDropdown) {
+            if (!showMoveDropdown) {
               e.currentTarget.style.background = '#edf2f7';
               e.currentTarget.style.borderColor = '#a0aec0';
             }
           }}
           onMouseOut={(e) => {
-            if (!showDropdown) {
+            if (!showMoveDropdown) {
               e.currentTarget.style.background = 'transparent';
               e.currentTarget.style.borderColor = '#cbd5e0';
             }
@@ -271,7 +298,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
          ❖
         </button>
 
-        {showDropdown && (
+        {showMoveDropdown && (
           <div
             style={{
               position: 'absolute',
