@@ -224,8 +224,18 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
               {/* Move To submenu */}
               <div
                 className={styles.moveToSubmenu}
-                onMouseEnter={() => setShowMoveSubmenu(true)}
-                onMouseLeave={() => setShowMoveSubmenu(false)}
+                onMouseEnter={() => {
+                  if (!isTouchDevice) setShowMoveSubmenu(true);
+                }}
+                onMouseLeave={() => {
+                  if (!isTouchDevice) setShowMoveSubmenu(false);
+                }}
+                onClick={(e) => {
+                  if (isTouchDevice) {
+                    e.stopPropagation();
+                    setShowMoveSubmenu(!showMoveSubmenu);
+                  }
+                }}
               >
                 <button className={`${styles.cardMenuItem} ${styles.moveToTrigger}`}>
                   <span className={styles.arrowIcon}>›</span>
