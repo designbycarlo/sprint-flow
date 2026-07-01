@@ -1,6 +1,7 @@
 import { login, signup } from './actions'
 import Image from 'next/image';
 import { PasswordInput } from '@/components/PasswordInput';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default async function LoginPage(props: { searchParams: Promise<{ error?: string }> }) {
   const searchParams = await props.searchParams;
@@ -10,21 +11,22 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
+        height: '100vh',
+        overflow: 'hidden',
         background: 'linear-gradient(135deg, #0f1419 0%, #1a202c 50%, #2d3748 100%)',
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       }}
     >
       <form className="login-form">
         {/* Logo centered above the title */}
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+        <div className="logo-container" style={{ textAlign: 'center', marginBottom: '20px', color: '#1a202c' }}>
           <Image
             src="/sprint-flow-logo.svg"
             alt="Sprint Flow"
             width={180}
             height={69}
             priority
-            style={{ display: 'inline-block' }}
+            style={{ display: 'inline-block', color: 'inherit' }}
           />
         </div>
 
@@ -90,6 +92,7 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
           </button>
         </div>
       </form>
+      <ThemeToggle />
     </div>
   )
 }
