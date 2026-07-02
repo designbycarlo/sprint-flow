@@ -1,7 +1,6 @@
 import { login, signup } from './actions'
 import Image from 'next/image';
 import { PasswordInput } from '@/components/PasswordInput';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default async function LoginPage(props: { searchParams: Promise<{ error?: string }> }) {
   const searchParams = await props.searchParams;
@@ -13,34 +12,35 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
         alignItems: 'center',
         height: '100vh',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #0f1419 0%, #1a202c 50%, #2d3748 100%)',
+        background: '#ffffff',
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       }}
+      className="login-page"
     >
       <form className="login-form">
         {/* Logo centered above the title */}
-        <div className="logo-container" style={{ textAlign: 'center', marginBottom: '20px', color: '#1a202c' }}>
+        <div className="logo-container" style={{ textAlign: 'center', marginBottom: '16px' }}>
           <Image
-            src="/sprint-flow-logo.svg"
+            src="/app-icon.svg"
             alt="Sprint Flow"
-            width={180}
-            height={69}
+            width={56}
+            height={56}
             priority
-            style={{ display: 'inline-block', color: 'inherit' }}
+            style={{ display: 'inline-block' }}
           />
         </div>
 
         <h2
           style={{
             textAlign: 'center',
-            marginBottom: '28px',
-            fontSize: '1.5rem',
+            marginBottom: '24px',
+            fontSize: '1.25rem',
             fontWeight: 600,
             color: '#1a202c',
             letterSpacing: '-0.02em',
           }}
         >
-          Welcome to Sprint Flow
+          Welcome to SprintFlow
         </h2>
 
         {searchParams?.error && (
@@ -63,7 +63,7 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
         <label
           htmlFor="email"
           style={{
-            marginBottom: '8px',
+            marginBottom: '6px',
             display: 'block',
             fontSize: '0.875rem',
             color: '#4a5568',
@@ -78,12 +78,12 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
           type="email"
           required
           className="login-input"
-          style={{ marginBottom: '18px' }}
+          style={{ marginBottom: '16px' }}
         />
 
         <PasswordInput />
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
           <button formAction={login} className="login-btn-primary">
             Log In
           </button>
@@ -92,7 +92,6 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
           </button>
         </div>
       </form>
-      <ThemeToggle />
     </div>
   )
 }

@@ -15,6 +15,17 @@
 }
 
 
+/* Login page - dark background on desktop */
+.login-page {
+  background: linear-gradient(135deg, #0f1419 0%, #1a202c 50%, #2d3748 100%) !important;
+}
+
+@media (max-width: 640px) {
+  .login-page {
+    background: #ffffff !important;
+  }
+}
+
 /* Login form */
 .login-form {
   width: 100%;
@@ -32,56 +43,52 @@
     width: 100%;
     height: 100vh;
     border-radius: 0;
-    padding: 40px 24px;
+    padding: 32px 24px;
     border: none;
     box-shadow: none;
     margin: 0;
-    background: linear-gradient(135deg, #0f1419 0%, #1a202c 50%, #2d3748 100%);
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
-  
-  .login-form .logo-container {
-    color: #e2e8f0 !important;
-  }
-  
+
   .login-form h2 {
-    color: #e2e8f0 !important;
+    color: #1a202c !important;
   }
-  
+
   .login-form label {
-    color: #a0aec0 !important;
+    color: #4a5568 !important;
   }
-  
+
   .login-form .login-input {
-    background: #2d3748;
-    border-color: #4a5568;
-    color: #e2e8f0;
+    background: #f7fafc;
+    border-color: #e2e8f0;
+    color: #1a202c;
   }
-  
+
   .login-form .login-input:focus {
-    background: #2d3748;
+    background: #ffffff;
     border-color: #4a6cf7;
   }
-  
+
   .login-form input:-webkit-autofill,
   .login-form input:-webkit-autofill:hover,
   .login-form input:-webkit-autofill:focus {
-    -webkit-text-fill-color: #e2e8f0;
-    -webkit-box-shadow: 0 0 0px 1000px #2d3748 inset;
-    caret-color: #e2e8f0;
+    -webkit-text-fill-color: #1a202c;
+    -webkit-box-shadow: 0 0 0px 1000px #f7fafc inset;
+    caret-color: #1a202c;
   }
-  
+
   .login-form .login-btn-secondary {
-    border-color: #4a5568;
-    color: #a0aec0;
+    border-color: #cbd5e0;
+    color: #4a5568;
   }
-  
+
   .login-form .login-btn-secondary:hover {
-    background: #4a5568;
-    border-color: #718096;
-    color: #e2e8f0;
+    background: #f7fafc;
+    border-color: #a0aec0;
+    color: #4a5568;
   }
 }
 
@@ -151,7 +158,6 @@ input:-webkit-autofill:focus {
   background: rgba(26, 32, 44, 0.92) !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 @media (prefers-color-scheme: dark) {
   :root {
