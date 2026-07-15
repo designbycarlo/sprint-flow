@@ -20,10 +20,11 @@ import { Card } from './Card';
 import { ThemeToggle } from './ThemeToggle';
 import { ProjectMenu } from './ProjectMenu';
 import { ProjectSwitcher } from './ProjectSwitcher';
+import { HamburgerMenu } from './HamburgerMenu';
 import { SprintFlowLogo } from './SprintFlowLogo';
 import { LogOutButton } from './LogOutButton';
 import styles from './Board.module.css';
-import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard } from '@/app/actions/kanban';
+import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
 
 export type CardData = {
   id: string;
@@ -66,6 +67,12 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   const [currentBoards, setCurrentBoards] = useState<BoardInfo[]>(boards);
   const [activeBoardId, setActiveBoardId] = useState<string>(initialBoardId);
   const [isSwitching, setIsSwitching] = useState(false);
+
+  // Lifted dialog state (shared by desktop File menu and mobile hamburger)
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false);
+  const [newProjectTitle, setNewProjectTitle] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -358,6 +365,68 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
     }
   };
 
+  const handleOpenNewProject = () => {
+    setNewProjectTitle('');
+    setShowNewProjectDialog(true);
+  };
+
+  const handleCreateProject = async () => {
+    if (!newProjectTitle.trim() || isCreating) return;
+
+    setIsCreating(true);
+    try {
+      const result = await createBoard(newProjectTitle.trim());
+      if (result.success && result.board) {
+        await handleBoardCreated(result.board);
+        setShowNewProjectDialog(false);
+        setNewProjectTitle('');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to create project', 'error');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleCancelNewProject = () => {
+    setShowNewProjectDialog(false);
+    setNewProjectTitle('');
+  };
+
+  const handleNewProjectKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCreateProject();
+    } else if (e.key === 'Escape') {
+      handleCancelNewProject();
+    }
+  };
+
+  const handleOpenDeleteProject = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    handleDeleteProject(activeBoardId);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
+  const handleRenameProject = async (boardId: string, title: string) => {
+    try {
+      await renameBoard(boardId, title);
+      setCurrentBoards(prev => prev.map(b => b.id === boardId ? { ...b, title } : b));
+      showToast('Project renamed', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to rename project', 'error');
+      throw err;
+    }
+  };
+
   if (!isMounted) {
     return null;
   }
@@ -382,7 +451,6 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 28px',
           background: 'rgba(255, 255, 255, 0.85)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
@@ -392,22 +460,37 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
         }}
         className="app-header"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
           <SprintFlowLogo />
-          <ProjectMenu
-            onBoardCreated={handleBoardCreated}
-            onDeleteProject={handleDeleteProject}
-            activeBoardId={activeBoardId}
-            activeBoardTitle={activeBoard?.title || ''}
-            boardCount={currentBoards.length}
-          />
-          <ProjectSwitcher 
-            boards={currentBoards} 
-            currentBoardId={activeBoardId} 
+          <div className={styles.desktopOnly}>
+            <ProjectMenu
+              onNewProjectClick={handleOpenNewProject}
+              onDeleteProjectClick={handleOpenDeleteProject}
+              activeBoardTitle={activeBoard?.title || ''}
+              boardCount={currentBoards.length}
+            />
+          </div>
+          <ProjectSwitcher
+            boards={currentBoards}
+            currentBoardId={activeBoardId}
             onSwitchBoard={handleSwitchBoard}
+            onRenameBoard={handleRenameProject}
           />
         </div>
-        <LogOutButton />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className={styles.desktopOnly}>
+            <LogOutButton />
+          </div>
+          <HamburgerMenu
+            boards={currentBoards}
+            currentBoardId={activeBoardId}
+            onSwitchBoard={handleSwitchBoard}
+            onNewProjectClick={handleOpenNewProject}
+            onDeleteProjectClick={handleOpenDeleteProject}
+            boardCount={currentBoards.length}
+            activeBoardTitle={activeBoard?.title || ''}
+          />
+        </div>
       </header>
 
       {/* Loading overlay when switching boards */}
@@ -509,6 +592,66 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
       {toastMessage && (
         <div className={`${styles.toast} ${styles[toastMessage.type]}`}>
           {toastMessage.message}
+        </div>
+      )}
+
+      {/* New Project Dialog */}
+      {showNewProjectDialog && (
+        <div className={styles.dialogOverlay} onClick={handleCancelNewProject}>
+          <div className={styles.dialogContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.dialogTitle}>New Project</h3>
+            <input
+              type="text"
+              value={newProjectTitle}
+              onChange={(e) => setNewProjectTitle(e.target.value)}
+              onKeyDown={handleNewProjectKeyDown}
+              placeholder="Project name"
+              className={styles.dialogInput}
+              autoFocus
+            />
+            <div className={styles.dialogActions}>
+              <button
+                onClick={handleCancelNewProject}
+                className={styles.dialogCancelBtn}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateProject}
+                disabled={!newProjectTitle.trim() || isCreating}
+                className={styles.dialogCreateBtn}
+              >
+                {isCreating ? 'Creating...' : 'Create'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div className={styles.dialogOverlay} onClick={handleCancelDelete}>
+          <div className={styles.dialogContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.dialogTitle}>Delete Project</h3>
+            <p className={styles.dialogDescription}>
+              Are you sure you want to delete <strong>&quot;{activeBoard?.title}&quot;</strong>?
+              This will permanently remove all columns and cards in this project.
+            </p>
+            <div className={styles.dialogActions}>
+              <button
+                onClick={handleCancelDelete}
+                className={styles.dialogCancelBtn}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className={styles.dialogDeleteBtn}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>

@@ -434,11 +434,180 @@
 /* Header styles */
 header.app-header {
   transition: background 0.3s ease, border-bottom 0.3s ease !important;
+  padding: 0 28px;
 }
 
 [data-theme="dark"] header.app-header {
   background: #F3F3F4 !important;
   border-bottom: 1px solid #ffffff14 !important;
+}
+
+/* Desktop-only / Mobile-only visibility (driven by breakpoints below) */
+.desktopOnly {
+  display: inline-flex;
+  align-items: center;
+}
+
+.mobileOnly {
+  display: none;
+}
+
+/* Hamburger Menu (mobile) */
+.hamburgerContainer {
+  position: relative;
+  display: none;
+}
+
+.hamburgerBtn {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  padding: 0 9px;
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.hamburgerBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.hamburgerBtn:active {
+  transform: scale(0.96);
+}
+
+.hamburgerBar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: #4a5568;
+  border-radius: 2px;
+}
+
+[data-theme="dark"] .hamburgerBtn {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .hamburgerBar {
+  background: #1a202c;
+}
+
+[data-theme="dark"] .hamburgerBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.hamburgerPanel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  z-index: 1100;
+  min-width: 240px;
+  max-width: 88vw;
+  padding: 8px;
+  animation: fadeIn 0.12s ease;
+}
+
+[data-theme="dark"] .hamburgerPanel {
+  background: #2d3748;
+  border-color: #4a5568;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.hamburgerSectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #a0aec0;
+  padding: 6px 12px 4px 12px;
+}
+
+.hamburgerItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: #2d3748;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  font-family: inherit;
+  border-radius: 8px;
+  transition: background 0.1s ease;
+}
+
+.hamburgerItem:hover {
+  background: #f7fafc;
+}
+
+[data-theme="dark"] .hamburgerItem {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .hamburgerItem:hover {
+  background: #4a5568;
+}
+
+.hamburgerItemActive {
+  background: #edf2f7;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .hamburgerItemActive {
+  background: #4a5568;
+  color: #f7fafc;
+}
+
+.hamburgerItemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hamburgerLogout {
+  padding: 4px 4px 2px 4px;
+}
+
+.hamburgerLogout :global(form) {
+  width: 100%;
+}
+
+.hamburgerLogout :global(button) {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  header.app-header {
+    padding: 0 16px;
+  }
+
+  .desktopOnly {
+    display: none !important;
+  }
+
+  .hamburgerContainer {
+    display: block;
+  }
+
+  .dialogContent {
+    max-width: calc(100% - 32px);
+    margin: 0 16px;
+    padding: 20px;
+  }
 }
 
 .themeToggle {
@@ -484,30 +653,42 @@ header.app-header {
 }
 
 .fileMenuBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: none;
-  padding: 6px 12px;
-  font-size: 14px;
+  padding: 6px 10px;
+  font-size: 12.5px;
   font-weight: 500;
-  color: #4a5568;
+  letter-spacing: 0.04em;
+  color: #a0aec0;
+  opacity: 0.85;
   cursor: pointer;
   border-radius: 6px;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
   font-family: inherit;
 }
 
 .fileMenuBtn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: #2d3748;
+  background: rgba(0, 0, 0, 0.04);
+  color: #718096;
+  opacity: 1;
+}
+
+.fileMenuGlyph {
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
 }
 
 [data-theme="dark"] .fileMenuBtn {
-  color: #e2e8f0;
+  color: #718096;
 }
 
 [data-theme="dark"] .fileMenuBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f7fafc;
+  background: rgba(255, 255, 255, 0.08);
+  color: #cbd5e0;
 }
 
 .fileMenuDropdown {
@@ -699,6 +880,10 @@ header.app-header {
 /* Project Switcher Styles */
 .projectSwitcherContainer {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
 }
 
 .projectSwitcherBtn {
@@ -707,15 +892,15 @@ header.app-header {
   gap: 6px;
   background: transparent;
   border: 1px solid transparent;
-  padding: 6px 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2d3748;
+  padding: 4px 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a202c;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: background 0.15s ease, border-color 0.15s ease;
   font-family: inherit;
-  max-width: 200px;
+  max-width: 280px;
 }
 
 .projectSwitcherBtn:hover {
@@ -730,6 +915,38 @@ header.app-header {
 [data-theme="dark"] .projectSwitcherBtn:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: #4a5568;
+}
+
+.projectRenameBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: #a0aec0;
+  opacity: 0.7;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.projectRenameBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #4a5568;
+  opacity: 1;
+}
+
+[data-theme="dark"] .projectRenameBtn {
+  color: #718096;
+}
+
+[data-theme="dark"] .projectRenameBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
 }
 
 .projectSwitcherTitle {

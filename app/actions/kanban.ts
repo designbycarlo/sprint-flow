@@ -188,6 +188,32 @@ export async function createBoard(title: string) {
   return { success: true, board: newBoard, columns: cols }
 }
 
+export async function renameBoard(boardId: string, title: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const trimmed = title.trim()
+  if (!trimmed) {
+    throw new Error("Board title cannot be empty")
+  }
+
+  const { error } = await supabase
+    .from('boards')
+    .update({ title: trimmed })
+    .eq('id', boardId)
+    .eq('user_id', user.id)
+
+  if (error) {
+    console.error("Error renaming board", error)
+    throw new Error("Failed to rename board")
+  }
+
+  revalidatePath('/')
+
+  return { success: true }
+}
+
 export async function deleteBoard(boardId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
