@@ -18,8 +18,12 @@ import { Board } from './Board';
 import { Column } from './Column';
 import { Card } from './Card';
 import { ThemeToggle } from './ThemeToggle';
+import { ProjectMenu } from './ProjectMenu';
+import { ProjectSwitcher } from './ProjectSwitcher';
+import { SprintFlowLogo } from './SprintFlowLogo';
+import { LogOutButton } from './LogOutButton';
 import styles from './Board.module.css';
-import { updateCardPosition, addCard, deleteCard, updateCard } from '@/app/actions/kanban';
+import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard } from '@/app/actions/kanban';
 
 export type CardData = {
   id: string;
@@ -39,7 +43,19 @@ export type BoardData = {
   columnOrder: string[];
 };
 
-export function KanbanContainer({ initialData }: { initialData: BoardData }) {
+type BoardInfo = {
+  id: string;
+  title: string;
+  created_at: string;
+};
+
+interface KanbanContainerProps {
+  initialData: BoardData;
+  boards: BoardInfo[];
+  currentBoardId: string;
+}
+
+export function KanbanContainer({ initialData, boards, currentBoardId: initialBoardId }: KanbanContainerProps) {
   const [data, setData] = useState<BoardData>(initialData);
   const [isMounted, setIsMounted] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -47,6 +63,9 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
   const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
   const [newCardTitle, setNewCardTitle] = useState('');
   const [newCardDescription, setNewCardDescription] = useState('');
+  const [currentBoards, setCurrentBoards] = useState<BoardInfo[]>(boards);
+  const [activeBoardId, setActiveBoardId] = useState<string>(initialBoardId);
+  const [isSwitching, setIsSwitching] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -127,7 +146,6 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
   const handleDeleteCard = async (cardId: string) => {
     try {
       await deleteCard(cardId);
-      // Find which column contains this card
       const columnId = findColumnByCardId(cardId);
       if (columnId) {
         setData({
@@ -172,11 +190,9 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
   const handleMoveCard = async (cardId: string, newColumnId: string) => {
     const previousData = data;
     
-    // Find current column
     const currentColumnId = findColumnByCardId(cardId);
     if (!currentColumnId || currentColumnId === newColumnId) return;
 
-    // Move card to new column
     const currentColumn = data.columns[currentColumnId];
     const newColumn = data.columns[newColumnId];
 
@@ -220,18 +236,15 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
     const activeId = active.id as string;
     const overId = over.id as string;
 
-    // Find the column containing the dragged card
     const activeColumnId = findColumnByCardId(activeId);
     if (!activeColumnId) return;
 
-    // Check if we're dragging over a column or a card
     const overColumnId = data.columns[overId] ? overId : findColumnByCardId(overId);
     if (!overColumnId) return;
 
     const previousData = data;
 
     if (activeColumnId === overColumnId) {
-      // Same column - reorder cards
       const column = data.columns[activeColumnId];
       const oldIndex = column.cardIds.indexOf(activeId);
       const newIndex = column.cardIds.indexOf(overId);
@@ -256,7 +269,6 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
         setData(previousData);
       }
     } else {
-      // Different column - move card
       const activeColumn = data.columns[activeColumnId];
       const overColumn = data.columns[overColumnId];
 
@@ -266,7 +278,6 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
       const newActiveCardIds = activeColumn.cardIds.filter(id => id !== activeId);
       const newOverCardIds = [...overColumn.cardIds];
       
-      // Insert at the correct position
       const insertIndex = overIndex >= 0 ? overIndex : newOverCardIds.length;
       newOverCardIds.splice(insertIndex, 0, activeId);
 
@@ -294,15 +305,118 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
     }
   };
 
+  const handleSwitchBoard = async (boardId: string) => {
+    if (boardId === activeBoardId || isSwitching) return;
+    setIsSwitching(true);
+    try {
+      const newData = await getBoardData(boardId);
+      setData(newData);
+      setActiveBoardId(boardId);
+      setAddingToColumn(null);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load board", "error");
+    } finally {
+      setIsSwitching(false);
+    }
+  };
+
+  const handleBoardCreated = async (newBoard: BoardInfo) => {
+    setCurrentBoards(prev => [...prev, newBoard]);
+    setIsSwitching(true);
+    try {
+      const newData = await getBoardData(newBoard.id);
+      setData(newData);
+      setActiveBoardId(newBoard.id);
+      setAddingToColumn(null);
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to load new board", "error");
+    } finally {
+      setIsSwitching(false);
+    }
+  };
+
+  const handleDeleteProject = async (boardId: string) => {
+    try {
+      await deleteBoard(boardId);
+      const remaining = currentBoards.filter(b => b.id !== boardId);
+      if (remaining.length === 0) {
+        window.location.reload();
+        return;
+      }
+      setCurrentBoards(remaining);
+      const newActive = remaining[0];
+      setActiveBoardId(newActive.id);
+      const newData = await getBoardData(newActive.id);
+      setData(newData);
+      setAddingToColumn(null);
+      showToast('Project deleted', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to delete project', 'error');
+    }
+  };
+
   if (!isMounted) {
     return null;
   }
 
   const activeCard = activeId ? data.cards[activeId] : null;
+  const activeBoard = currentBoards.find(b => b.id === activeBoardId);
+  const totalCards = Object.keys(data.cards).length;
+  const isBoardEmpty = totalCards === 0;
 
   return (
     <>
       <ThemeToggle />
+      
+      {/* Header */}
+      <header
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 28px',
+          background: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+          zIndex: 200,
+          transition: 'background 0.3s ease',
+        }}
+        className="app-header"
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <SprintFlowLogo />
+          <ProjectMenu
+            onBoardCreated={handleBoardCreated}
+            onDeleteProject={handleDeleteProject}
+            activeBoardId={activeBoardId}
+            activeBoardTitle={activeBoard?.title || ''}
+            boardCount={currentBoards.length}
+          />
+          <ProjectSwitcher 
+            boards={currentBoards} 
+            currentBoardId={activeBoardId} 
+            onSwitchBoard={handleSwitchBoard}
+          />
+        </div>
+        <LogOutButton />
+      </header>
+
+      {/* Loading overlay when switching boards */}
+      {isSwitching && (
+        <div className={styles.boardLoadingOverlay}>
+          <div className={styles.boardLoadingSpinner} />
+        </div>
+      )}
+
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
@@ -312,6 +426,13 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
           {data.columnOrder.map((colId) => {
             const column = data.columns[colId];
             const cards = column.cardIds.map((cardId) => data.cards[cardId]);
+            const isEmpty = column.cardIds.length === 0;
+
+            const emptyIcons: Record<string, string> = {
+              'To Do': '📋',
+              'In Progress': '🚀',
+              'Done': '✅',
+            };
 
             return (
               <Column
@@ -331,20 +452,44 @@ export function KanbanContainer({ initialData }: { initialData: BoardData }) {
                   items={column.cardIds}
                   strategy={verticalListSortingStrategy}
                 >
-                  {cards.map((card) => (
-                    <Card
-                      key={card.id}
-                      id={card.id}
-                      title={card.title}
-                      description={card.description}
-                      currentColumnId={column.id}
-                      currentColumnTitle={column.title}
-                      columns={data.columns}
-                      onMoveCard={handleMoveCard}
-                      onEditCard={handleEditCard}
-                      onDeleteCard={handleDeleteCard}
-                    />
-                  ))}
+                  {isEmpty && isBoardEmpty ? (
+                    <div className={styles.emptyColumn}>
+                      <span className={styles.emptyColumnIcon}>{emptyIcons[column.title] || '📁'}</span>
+                      <p className={styles.emptyColumnTitle}>
+                        {column.title === 'To Do' && 'No tasks yet'}
+                        {column.title === 'In Progress' && 'Nothing in progress'}
+                        {column.title === 'Done' && 'No completed tasks'}
+                      </p>
+                      <p className={styles.emptyColumnHint}>
+                        {column.title === 'To Do'
+                          ? 'Click "+ Add Card" to create your first task'
+                          : 'Cards will appear here as you work on them'}
+                      </p>
+                    </div>
+                  ) : isEmpty && !isBoardEmpty ? (
+                    <div className={styles.emptyColumnCompact}>
+                      <p className={styles.emptyColumnCompactText}>
+                        {column.title === 'To Do' && 'No tasks'}
+                        {column.title === 'In Progress' && 'No tasks in progress'}
+                        {column.title === 'Done' && 'No completed tasks'}
+                      </p>
+                    </div>
+                  ) : (
+                    cards.map((card) => (
+                      <Card
+                        key={card.id}
+                        id={card.id}
+                        title={card.title}
+                        description={card.description}
+                        currentColumnId={column.id}
+                        currentColumnTitle={column.title}
+                        columns={data.columns}
+                        onMoveCard={handleMoveCard}
+                        onEditCard={handleEditCard}
+                        onDeleteCard={handleDeleteCard}
+                      />
+                    ))
+                  )}
                 </SortableContext>
               </Column>
             );

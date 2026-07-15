@@ -1,6 +1,4 @@
 import { KanbanContainer } from '@/components/KanbanContainer'
-import { LogOutButton } from '@/components/LogOutButton'
-import { SprintFlowLogo } from '@/components/SprintFlowLogo'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function Home() {
@@ -11,11 +9,12 @@ export default async function Home() {
 
   if (!user) return null
 
-  // Fetch boards, columns, cards
-  const { data: boards } = await supabase.from('boards').select('*').eq('user_id', user.id).limit(1)
+  // Fetch all boards for this user
+  const { data: allBoards } = await supabase.from('boards').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
   
-  let board = boards?.[0]
-  if (!board) {
+  let boards = allBoards || []
+  
+  if (boards.length === 0) {
     // Manually create the default board and columns if the trigger failed
     const { data: newBoard, error: boardError } = await supabase.from('boards').insert({ user_id: user.id, title: 'My Sprint Board' }).select().single()
     
@@ -30,13 +29,13 @@ export default async function Home() {
         )
     }
 
-    board = newBoard
+    boards = [newBoard]
 
     // Create Columns
     const { data: cols } = await supabase.from('columns').insert([
-        { board_id: board.id, title: 'To Do', position_index: 0 },
-        { board_id: board.id, title: 'In Progress', position_index: 1 },
-        { board_id: board.id, title: 'Done', position_index: 2 }
+        { board_id: newBoard.id, title: 'To Do', position_index: 0 },
+        { board_id: newBoard.id, title: 'In Progress', position_index: 1 },
+        { board_id: newBoard.id, title: 'Done', position_index: 2 }
     ]).select()
 
     if (cols && cols.length === 3) {
@@ -54,7 +53,10 @@ export default async function Home() {
     }
   }
 
-  const { data: columns } = await supabase.from('columns').select('*').eq('board_id', board.id).order('position_index', { ascending: true })
+  // Use the first board as the current board
+  const currentBoard = boards[0]
+
+  const { data: columns } = await supabase.from('columns').select('*').eq('board_id', currentBoard.id).order('position_index', { ascending: true })
   
   // To query cards for the columns safely via RLS we can fetch them separately
   // or fetch by column IDs. For simplicity we fetch all cards that belong to this board's columns.
@@ -89,37 +91,20 @@ export default async function Home() {
     columnOrder
   }
 
+  // Serialize boards for client component
+  const serializedBoards = boards.map(b => ({
+    id: b.id,
+    title: b.title,
+    created_at: b.created_at
+  }))
+
   return (
     <main>
-      {/* Header with logo on left and LogOut on right */}
-      <header
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '60px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 28px',
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-          zIndex: 200,
-          transition: 'background 0.3s ease',
-        }}
-        className="app-header"
-      >
-        <SprintFlowLogo />
-        <LogOutButton />
-      </header>
-
-      {/* Push content below fixed header */}
-      <div style={{ paddingTop: '60px' }}>
-        <KanbanContainer initialData={initialData} />
-      </div>
+      <KanbanContainer 
+        initialData={initialData} 
+        boards={serializedBoards}
+        currentBoardId={currentBoard.id}
+      />
     </main>
   );
 }
