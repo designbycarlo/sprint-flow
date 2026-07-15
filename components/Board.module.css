@@ -1,7 +1,7 @@
 .board {
   display: flex;
-  gap: 24px;
-  padding: 80px 32px 32px 32px;
+  gap: 20px;
+  padding: 72px 20px 24px 20px;
   overflow-x: auto;
   align-items: flex-start;
   min-height: 100vh;
@@ -20,13 +20,13 @@
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px;
+  border-radius: 14px;
   min-width: 320px;
   max-width: 320px;
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.05);
+  padding: 14px 16px;
+  box-shadow:0 4px 24px 0 rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
 }
@@ -38,8 +38,8 @@
 }
 
 .columnHeader {
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -48,7 +48,7 @@
 }
 
 .columnTitle {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: #1a202c;
   margin: 0;
@@ -62,20 +62,20 @@
 .columnBody {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .addCardBtn {
-  margin-top: 16px;
+  margin-top: 12px;
   background: transparent;
   border: 1px dashed #cbd5e0;
   border-radius: 10px;
-  padding: 12px;
+  padding: 10px;
   color: #4a5568;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
 }
 
 .addCardBtn:hover {
@@ -97,8 +97,8 @@
 
 .card {
   background: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
+  border-radius: 10px;
+  padding: 12px 14px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   cursor: grab;
   border: 1px solid rgba(0, 0, 0, 0.02);
@@ -106,6 +106,7 @@
   -webkit-user-select: none;
   touch-action: none;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 [data-theme="dark"] .card {
@@ -124,8 +125,8 @@
 }
 
 .cardTitle {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 0.95rem;
+  font-weight: 600;
   color: #2d3748;
   margin: 0;
   transition: color 0.3s ease;
@@ -136,15 +137,97 @@
 }
 
 .cardDescription {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: #718096;
-  margin: 8px 0 0 0;
-  line-height: 1.5;
+  margin: 6px 0 0 0;
+  line-height: 1.45;
   transition: color 0.3s ease;
 }
 
 [data-theme="dark"] .cardDescription {
   color: #a0aec0;
+}
+
+/* Description is hidden by default and revealed on hover (desktop) */
+.cardDescriptionCollapsed {
+  display: none;
+}
+
+.cardHoverable:hover .cardDescriptionCollapsed {
+  display: block;
+  animation: fadeIn 0.12s ease;
+}
+
+/* Description icon button (visible by default when a description exists) */
+.cardDescBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  color: #a0aec0;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Desktop: hide the description icon on card hover (description text reveals instead) */
+.cardHoverable:hover .cardDescBtn {
+  display: none;
+}
+
+/* Touch / responsive: always show so it can be tapped */
+.cardTouch .cardDescBtn {
+  display: inline-flex;
+}
+
+.cardDescBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #4a5568;
+}
+
+[data-theme="dark"] .cardDescBtn {
+  color: #718096;
+}
+
+[data-theme="dark"] .cardDescBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+}
+
+/* Transient "Copied" badge */
+.copiedBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: #2d3748;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 999px;
+  z-index: 30;
+  pointer-events: none;
+  animation: fadeIn 0.12s ease;
+}
+
+[data-theme="dark"] .copiedBadge {
+  background: #e2e8f0;
+  color: #1a202c;
+}
+
+@media (max-width: 768px) {
+  /* Center the copy confirmation on small / touch screens */
+  .copiedBadge {
+    left: 50%;
+    right: auto;
+    bottom: 10px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    padding: 6px 14px;
+  }
 }
 
 .dragging {
@@ -508,12 +591,12 @@ header.app-header {
   margin-top: 8px;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
   z-index: 1100;
-  min-width: 240px;
+  min-width: 220px;
   max-width: 88vw;
-  padding: 8px;
+  padding: 6px;
   animation: fadeIn 0.12s ease;
 }
 
@@ -529,7 +612,7 @@ header.app-header {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #a0aec0;
-  padding: 6px 12px 4px 12px;
+  padding: 4px 12px 2px 12px;
 }
 
 .hamburgerItem {
@@ -538,7 +621,7 @@ header.app-header {
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  padding: 10px 12px;
+  padding: 11px 12px;
   border: none;
   background: transparent;
   color: #2d3748;
@@ -592,7 +675,7 @@ header.app-header {
 
 @media (max-width: 768px) {
   header.app-header {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
   .desktopOnly {
@@ -601,6 +684,41 @@ header.app-header {
 
   .hamburgerContainer {
     display: block;
+  }
+
+  /* Card / column density on small screens */
+  .board {
+    padding: 72px 12px 20px 12px;
+    gap: 14px;
+  }
+
+  .column {
+    min-width: 300px;
+    max-width: 300px;
+    padding: 12px 14px;
+  }
+
+  .columnBody {
+    gap: 10px;
+  }
+
+  /* Comfortable touch targets for card actions */
+  .cardMenuBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .projectRenameBtn {
+    width: 34px;
+    height: 34px;
+  }
+
+  .cardDescBtn {
+    padding: 4px 6px;
+  }
+
+  .hamburgerItem {
+    padding: 13px 12px;
   }
 
   .dialogContent {
@@ -649,7 +767,7 @@ header.app-header {
 /* File Menu Styles */
 .fileMenuContainer {
   position: relative;
-  margin-right: 16px;
+  margin-right: 12px;
 }
 
 .fileMenuBtn {
@@ -695,21 +813,21 @@ header.app-header {
   position: absolute;
   top: 100%;
   left: 0;
-  margin-top: 4px;
+  margin-top: 6px;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
-  min-width: 160px;
-  padding: 4px 0;
+  min-width: 180px;
+  padding: 6px 0;
   animation: fadeIn 0.12s ease;
 }
 
 [data-theme="dark"] .fileMenuDropdown {
   background: #2d3748;
   border: 1px solid #4a5568;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .fileMenuItem {
@@ -717,7 +835,7 @@ header.app-header {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 14px;
+  padding: 9px 14px;
   border: none;
   background: transparent;
   color: #2d3748;
@@ -973,22 +1091,22 @@ header.app-header {
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 4px;
+  margin-top: 6px;
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   min-width: 200px;
   max-width: 300px;
-  padding: 4px 0;
+  padding: 6px 0;
   animation: fadeIn 0.12s ease;
 }
 
 [data-theme="dark"] .projectSwitcherDropdown {
   background: #2d3748;
   border: 1px solid #4a5568;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .projectSwitcherItem {
@@ -996,7 +1114,7 @@ header.app-header {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 14px;
+  padding: 9px 14px;
   border: none;
   background: transparent;
   color: #2d3748;

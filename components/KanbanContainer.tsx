@@ -460,7 +460,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
         }}
         className="app-header"
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
           <SprintFlowLogo />
           <div className={styles.desktopOnly}>
             <ProjectMenu
@@ -477,7 +477,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             onRenameBoard={handleRenameProject}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div className={styles.desktopOnly}>
             <LogOutButton />
           </div>

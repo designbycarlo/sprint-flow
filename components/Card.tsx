@@ -25,6 +25,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
   const [showMoveSubmenu, setShowMoveSubmenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [copied, setCopied] = useState<null | 'title' | 'desc'>(null);
 
   const {
     attributes,
@@ -105,6 +106,16 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     setEditDescription(description || '');
   };
 
+  const handleCopy = async (text: string, kind: 'title' | 'desc') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(kind);
+      window.setTimeout(() => setCopied(null), 1200);
+    } catch {
+      // Clipboard not available; ignore silently
+    }
+  };
+
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${styles.card} ${isDragging ? styles.dragging : ''}`}>
@@ -181,7 +192,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       style={style}
       {...attributes}
       {...listeners}
-      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${!isTouchDevice ? styles.cardHoverable : ''}`}
+      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${!isTouchDevice ? styles.cardHoverable : ''} ${isTouchDevice ? styles.cardTouch : ''}`}
       onMouseEnter={() => {
         if (!isTouchDevice) setMenuVisible(true);
       }}
@@ -190,9 +201,59 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1 }}>
-          <h4 className={styles.cardTitle}>{title}</h4>
-          {description && <p className={styles.cardDescription}>{description}</p>}
+        <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
+          <h4
+            className={styles.cardTitle}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopy(title, 'title');
+            }}
+            title="Click to copy title"
+            style={{ cursor: 'pointer' }}
+          >
+            {title}
+          </h4>
+          {description && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+              <button
+                type="button"
+                className={styles.cardDescBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(description, 'desc');
+                }}
+                title={description}
+                aria-label="Copy description"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="4" y1="7" x2="20" y2="7" />
+                  <line x1="4" y1="12" x2="20" y2="12" />
+                  <line x1="4" y1="17" x2="20" y2="17" />
+                </svg>
+              </button>
+              <p
+                className={`${styles.cardDescription} ${!isTouchDevice ? styles.cardDescriptionCollapsed : ''}`}
+                style={{ margin: 0, cursor: 'pointer' }}
+                title="Click to copy description"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCopy(description, 'desc');
+                }}
+              >
+                {description}
+              </p>
+            </div>
+          )}
         </div>
         {/* 3-dot vertical menu trigger - always visible on touch, visible on hover for desktop */}
         <div
@@ -283,6 +344,11 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
           )}
         </div>
       </div>
+      {copied && (
+        <span className={styles.copiedBadge}>
+          {copied === 'title' ? 'Title' : 'Description'} copied
+        </span>
+      )}
     </div>
   );
 }
