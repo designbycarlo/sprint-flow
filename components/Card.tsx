@@ -543,9 +543,18 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                 >
                   Description
                 </h4>
+                <div
+                  style={{
+                    border: `1px dashed ${isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)'}`,
+                    borderRadius: '10px',
+                    padding: '12px 14px',
+                    marginBottom: '20px',
+                    background: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)',
+                  }}
+                >
                 <p
                   style={{
-                    margin: '0 0 20px 0',
+                    margin: 0,
                     fontSize: '16px',
                     lineHeight: '1.5',
                     color: copied === 'desc' ? '#22c55e' : (isDark ? '#e2e8f0' : '#2d3748'),
@@ -566,6 +575,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                 >
                   {description}
                 </p>
+                </div>
               </div>
             )}
             {isTouchDevice ? (
@@ -574,12 +584,12 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                   margin: '16px 0 0 0',
                   fontSize: '13px',
                   color: copied ? '#22c55e' : '#a0aec0',
-                  textAlign: 'center',
+                  textAlign: 'left',
                 }}
               >
                 {copied
                   ? `${copied === 'title' ? 'Title' : 'Description'} copied`
-                  : 'Long-press the title or description to copy'}
+                  : '* Long-press the title or description to copy'}
               </p>
             ) : (
               <div

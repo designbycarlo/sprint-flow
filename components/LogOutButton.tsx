@@ -20,6 +20,7 @@ export function LogOutButton() {
           borderRadius: "8px",
           cursor: "pointer",
           fontSize: "13px",
+          marginRight: "5px",
           transition: "all 0.2s ease",
         }}
         onMouseOver={(e) => {

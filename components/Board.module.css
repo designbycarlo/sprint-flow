@@ -557,7 +557,9 @@
 .toast {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
+  right: auto;
+  transform: none;
   padding: 16px 24px;
   border-radius: 12px;
   color: white;
@@ -595,6 +597,11 @@ header.app-header {
 /* Right-aligned header actions (log out, hamburger) need right padding */
 header.app-header > div:last-child {
   padding-right: 4px;
+}
+
+/* Log out button right margin on header (LogOutButton renders a <form>) */
+header.app-header .desktopOnly > :global(form) {
+  margin-right: 8px;
 }
 
 [data-theme="dark"] header.app-header {
