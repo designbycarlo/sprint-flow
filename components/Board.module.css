@@ -1,5 +1,5 @@
 .boardScroll {
-  padding: 84px 20px 24px 20px;
+  padding: 68px 20px 24px 20px;
   overflow-x: auto;
   min-height: 100vh;
   background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
@@ -28,10 +28,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 40px;
+  min-height: 32px;
   width: 100%;
   max-width: 100vw;
-  padding: 4px 4px 16px 4px;
+  padding: 0 4px 10px 4px;
   box-sizing: border-box;
   background: transparent;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -757,7 +757,7 @@ header.app-header {
 
   /* Card / column density on small screens */
   .boardScroll {
-    padding: 76px 12px 20px 12px;
+    padding: 66px 12px 20px 12px;
   }
 
   .board {
@@ -765,7 +765,7 @@ header.app-header {
   }
 
   .welcomeWidget {
-    padding: 8px 12px;
+    padding: 0 4px 8px 4px;
     gap: 8px;
   }
 
