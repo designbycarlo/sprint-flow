@@ -494,8 +494,6 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
         </div>
       </header>
 
-      <WelcomeWidget />
-
       {/* Loading overlay when switching boards */}
       {isSwitching && (
         <div className={styles.boardLoadingOverlay}>
@@ -508,7 +506,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <Board className={styles.board}>
+        <Board header={<WelcomeWidget />}>
           {data.columnOrder.map((colId) => {
             const column = data.columns[colId];
             const cards = column.cardIds.map((cardId) => data.cards[cardId]);

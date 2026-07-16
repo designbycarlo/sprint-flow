@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Board.module.css';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -444,7 +445,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
         </span>
       )}
 
-      {showDetailView && (
+      {showDetailView && typeof document !== 'undefined' && createPortal(
         <div
           style={{
             position: 'fixed',
@@ -619,7 +620,8 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

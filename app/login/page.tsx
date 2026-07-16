@@ -1,6 +1,6 @@
-import { login, signup } from './actions'
 import Image from 'next/image';
 import { PasswordInput } from '@/components/PasswordInput';
+import { LoginButtons } from '@/components/LoginButtons';
 
 export default async function LoginPage(props: { searchParams: Promise<{ error?: string }> }) {
   const searchParams = await props.searchParams;
@@ -83,14 +83,7 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
 
         <PasswordInput />
 
-        <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
-          <button formAction={login} className="login-btn-primary">
-            Log In
-          </button>
-          <button formAction={signup} className="login-btn-secondary">
-            Sign Up
-          </button>
-        </div>
+        <LoginButtons />
       </form>
     </div>
   )

@@ -4,13 +4,17 @@ import styles from './Board.module.css';
 
 interface BoardProps {
   children: ReactNode;
+  header?: ReactNode;
   className?: string;
 }
 
-export function Board({ children, className }: BoardProps) {
+export function Board({ children, header, className }: BoardProps) {
   return (
-    <div className={`${styles.board} ${className || ''}`}>
-      {children}
+    <div className={`${styles.boardScroll} ${className || ''}`}>
+      {header}
+      <div className={styles.board}>
+        {children}
+      </div>
     </div>
   );
 }

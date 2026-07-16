@@ -1,11 +1,17 @@
 "use client";
 
 import { signout } from "@/app/login/actions";
+import { clearClientCache } from "@/utils/clearClientCache";
 
 export function LogOutButton() {
+  const handleClick = () => {
+    void clearClientCache();
+  };
+
   return (
     <form action={signout}>
       <button
+        onClick={handleClick}
         style={{
           background: "transparent",
           color: "var(--btn-text, #333)",
