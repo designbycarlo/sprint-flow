@@ -20,12 +20,19 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [showDetailView, setShowDetailView] = useState(false);
+  const longPressTimeout = useRef<number | null>(null);
+  const pressTimer = useRef<number | null>(null);
   const [editTitle, setEditTitle] = useState(title);
   const [editDescription, setEditDescription] = useState(description || '');
   const [showMoveSubmenu, setShowMoveSubmenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [copied, setCopied] = useState<null | 'title' | 'desc'>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+  const isTouchDragged = useRef<boolean>(false);
+  const dragActive = useRef<boolean>(false);
 
   const {
     attributes,
@@ -33,7 +40,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging: sortableIsDragging,
   } = useSortable({ id });
 
   const columnColor =
@@ -45,8 +52,8 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 'auto',
+    opacity: sortableIsDragging ? 0.5 : 1,
+    zIndex: sortableIsDragging ? 1000 : 'auto',
     borderLeft: columnColor ? `1px solid ${columnColor}` : undefined,
   };
 
@@ -116,9 +123,63 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     }
   };
 
+  const handleDetailView = (e: any) => {
+    if (e) e.stopPropagation();
+    setShowDetailView(true);
+  };
+
+  const handleLongPress = (e: any) => {
+    e.stopPropagation();
+    pressTimer.current = window.setTimeout(() => {
+      setShowDetailView(true);
+    }, 500);
+  };
+
+  const handleTouchStart = (e: any) => {
+    if (isTouchDevice) {
+      const touch = e.touches[0];
+      touchStartX.current = touch.clientX;
+      touchStartY.current = touch.clientY;
+      dragActive.current = false;
+      pressTimer.current = window.setTimeout(() => {
+        setShowDetailView(true);
+      }, 500);
+    }
+  };
+
+  const handleTouchMove = (e: any) => {
+    if (isTouchDevice) {
+      if (pressTimer.current) {
+        clearTimeout(pressTimer.current);
+        pressTimer.current = null;
+      }
+      const touch = e.touches[0];
+      const deltaX = Math.abs(touch.clientX - touchStartX.current);
+      const deltaY = Math.abs(touch.clientY - touchStartY.current);
+      if (deltaX > 10 || deltaY > 10) {
+        dragActive.current = true;
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  const copyTitle = () => {
+    handleCopy(title, 'title');
+  };
+
+  const copyDescription = () => {
+    if (description) handleCopy(description, 'desc');
+  };
+
   if (isEditing) {
     return (
-      <div ref={setNodeRef} style={style} className={`${styles.card} ${isDragging ? styles.dragging : ''}`}>
+      <div ref={setNodeRef} style={style} className={`${styles.card} ${sortableIsDragging ? styles.dragging : ''}`}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <input
             type="text"
@@ -192,7 +253,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       style={style}
       {...attributes}
       {...listeners}
-      className={`${styles.card} ${isDragging ? styles.dragging : ''} ${!isTouchDevice ? styles.cardHoverable : ''} ${isTouchDevice ? styles.cardTouch : ''}`}
+      className={`${styles.card} ${sortableIsDragging ? styles.dragging : ''} ${!isTouchDevice ? styles.cardHoverable : ''} ${isTouchDevice ? styles.cardTouch : ''}`}
       onMouseEnter={() => {
         if (!isTouchDevice) setMenuVisible(true);
       }}
@@ -200,20 +261,20 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
         if (!isTouchDevice && !showMenu) setMenuVisible(false);
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: description && !isTouchDevice ? 'flex-start' : 'center', minHeight: description && !isTouchDevice ? 'auto' : '100%' }}>
         <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
           <h4
-            className={styles.cardTitle}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleCopy(title, 'title');
-            }}
-            title="Click to copy title"
-            style={{ cursor: 'pointer' }}
+            onClick={handleDetailView}
+            title={isTouchDevice ? "Long press for details" : undefined}
+            style={{ cursor: isTouchDevice ? 'pointer' : 'default' }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
           >
             {title}
           </h4>
-          {description && (
+          {description && !isTouchDevice && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
               <button
                 type="button"
@@ -244,7 +305,6 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
               <p
                 className={`${styles.cardDescription} ${!isTouchDevice ? styles.cardDescriptionCollapsed : ''}`}
                 style={{ margin: 0, cursor: 'pointer' }}
-                title="Click to copy description"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleCopy(description, 'desc');
@@ -348,6 +408,130 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
         <span className={styles.copiedBadge}>
           {copied === 'title' ? 'Title' : 'Description'} copied
         </span>
+      )}
+
+      {showDetailView && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setShowDetailView(false)}
+        >
+          <div
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: '24px',
+              maxWidth: '400px',
+              width: '90%',
+              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              style={{
+                margin: '0 0 16px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: '#1a202c',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+              }}
+            >
+              {title}
+              <button
+                onClick={() => setShowDetailView(false)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#a0aec0',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  padding: '0',
+                }}
+              >
+                ×
+              </button>
+            </h3>
+            {description && (
+              <div>
+                <h4
+                  style={{
+                    margin: '0 0 8px 0',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#718096',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  Description
+                </h4>
+                <p
+                  style={{
+                    margin: '0 0 20px 0',
+                    fontSize: '16px',
+                    lineHeight: '1.5',
+                    color: '#2d3748',
+                  }}
+                >
+                  {description}
+                </p>
+              </div>
+            )}
+            <div
+              style={{
+                display: 'flex',
+                gap: '8px',
+                justifyContent: 'flex-end',
+                marginTop: '20px',
+              }}
+            >
+              <button
+                onClick={copyTitle}
+                style={{
+                  padding: '8px 16px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '6px',
+                  background: 'white',
+                  color: '#4a5568',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                }}
+              >
+                Copy Title
+              </button>
+              {description && (
+                <button
+                  onClick={copyDescription}
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '6px',
+                    background: '#4a5568',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Copy Description
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
