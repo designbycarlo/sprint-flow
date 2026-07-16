@@ -521,7 +521,7 @@ header.app-header {
 }
 
 [data-theme="dark"] header.app-header {
-  background: #F3F3F4 !important;
+  background: rgba(26, 32, 44, 0.92) !important;
   border-bottom: 1px solid #ffffff14 !important;
 }
 
@@ -545,12 +545,13 @@ header.app-header {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: 4px;
   width: 40px;
   height: 40px;
-  padding: 0 9px;
+  padding: 0;
   background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -567,17 +568,13 @@ header.app-header {
 .hamburgerBar {
   display: block;
   height: 2px;
-  width: 100%;
+  width: 22px;
   background: #4a5568;
   border-radius: 2px;
 }
 
-[data-theme="dark"] .hamburgerBtn {
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
 [data-theme="dark"] .hamburgerBar {
-  background: #1a202c;
+  background: #e2e8f0;
 }
 
 [data-theme="dark"] .hamburgerBtn:hover {
