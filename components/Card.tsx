@@ -210,36 +210,36 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     return (
       <div ref={setNodeRef} style={style} className={`${styles.card} ${sortableIsDragging ? styles.dragging : ''}`}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <input
-            type="text"
-            value={editTitle}
-            onChange={(e) => setEditTitle(e.target.value)}
-            placeholder="Title"
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: '1px solid #cbd5e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              fontFamily: 'inherit',
-            }}
-            autoFocus
-          />
-          <textarea
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            placeholder="Description"
-            style={{
-              width: '100%',
-              padding: '6px 8px',
-              border: '1px solid #cbd5e0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              fontFamily: 'inherit',
-              minHeight: '50px',
-              resize: 'vertical',
-            }}
-          />
+            <input
+              type="text"
+              value={editTitle}
+              onChange={(e) => setEditTitle(e.target.value)}
+              placeholder="Title"
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                border: '1px solid #cbd5e0',
+                borderRadius: '4px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+              }}
+              autoFocus
+            />
+            <textarea
+              value={editDescription}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder="Description"
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                border: '1px solid #cbd5e0',
+                borderRadius: '4px',
+                fontSize: '16px',
+                fontFamily: 'inherit',
+                minHeight: '50px',
+                resize: 'vertical',
+              }}
+            />
           <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
             <button
               onClick={handleCancelEdit}
@@ -293,9 +293,14 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: description ? 'flex-start' : 'center', minHeight: description ? 'auto' : '100%' }}>
         <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
           <h4
-            onClick={handleDetailView}
-            title={isTouchDevice ? "Long press for details" : undefined}
-            style={{ cursor: isTouchDevice ? 'pointer' : 'default' }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isTouchDevice) {
+                copyTitle();
+              }
+            }}
+            title={isTouchDevice ? "Long press for details" : "Click to copy title"}
+            style={{ cursor: 'pointer' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}

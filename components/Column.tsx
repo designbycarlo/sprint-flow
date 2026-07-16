@@ -64,7 +64,7 @@ export function Column({ id, title, children, onAddCard, isAddingCard, newCardTi
                 padding: '8px 12px',
                 border: '1px solid #e2e8f0',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: '16px',
                 fontFamily: 'inherit',
               }}
               autoFocus
@@ -78,7 +78,7 @@ export function Column({ id, title, children, onAddCard, isAddingCard, newCardTi
                 padding: '8px 12px',
                 border: '1px solid #e2e8f0',
                 borderRadius: '8px',
-                fontSize: '14px',
+                fontSize: '16px',
                 fontFamily: 'inherit',
                 minHeight: '60px',
                 resize: 'vertical',

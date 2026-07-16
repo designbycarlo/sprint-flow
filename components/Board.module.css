@@ -592,6 +592,11 @@ header.app-header {
   padding: 0 28px;
 }
 
+/* Right-aligned header actions (log out, hamburger) need right padding */
+header.app-header > div:last-child {
+  padding-right: 4px;
+}
+
 [data-theme="dark"] header.app-header {
   background: rgba(26, 32, 44, 0.92) !important;
   border-bottom: 1px solid #ffffff14 !important;
@@ -1021,7 +1026,7 @@ header.app-header {
   padding: 10px 12px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-family: inherit;
   box-sizing: border-box;
   transition: border-color 0.15s ease;
