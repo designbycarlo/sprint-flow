@@ -191,12 +191,25 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
   };
 
   const copyPressTimer = useRef<number | null>(null);
+  const copyLongPressFired = useRef(false);
 
   const startCopyLongPress = (text: string, kind: 'title' | 'desc') => {
+    copyLongPressFired.current = false;
     if (copyPressTimer.current) clearTimeout(copyPressTimer.current);
     copyPressTimer.current = window.setTimeout(() => {
-      handleCopy(text, kind);
+      copyLongPressFired.current = true;
     }, 500);
+  };
+
+  const endCopyLongPress = (text: string, kind: 'title' | 'desc') => {
+    if (copyPressTimer.current) {
+      clearTimeout(copyPressTimer.current);
+      copyPressTimer.current = null;
+    }
+    if (copyLongPressFired.current) {
+      copyLongPressFired.current = false;
+      handleCopy(text, kind);
+    }
   };
 
   const cancelCopyLongPress = () => {
@@ -204,6 +217,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
       clearTimeout(copyPressTimer.current);
       copyPressTimer.current = null;
     }
+    copyLongPressFired.current = false;
   };
 
   if (isEditing) {
@@ -505,11 +519,11 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                 title="Long-press to copy title"
                 onClick={!isTouchDevice ? copyTitle : undefined}
                 onTouchStart={() => startCopyLongPress(title, 'title')}
-                onTouchEnd={cancelCopyLongPress}
+                onTouchEnd={() => endCopyLongPress(title, 'title')}
                 onTouchMove={cancelCopyLongPress}
                 onTouchCancel={cancelCopyLongPress}
                 onMouseDown={isTouchDevice ? () => startCopyLongPress(title, 'title') : undefined}
-                onMouseUp={isTouchDevice ? cancelCopyLongPress : undefined}
+                onMouseUp={isTouchDevice ? () => endCopyLongPress(title, 'title') : undefined}
                 onMouseLeave={isTouchDevice ? cancelCopyLongPress : undefined}
               >
                 {title}
@@ -566,11 +580,11 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                   title="Long-press to copy description"
                   onClick={!isTouchDevice ? copyDescription : undefined}
                   onTouchStart={() => startCopyLongPress(description, 'desc')}
-                  onTouchEnd={cancelCopyLongPress}
+                  onTouchEnd={() => endCopyLongPress(description, 'desc')}
                   onTouchMove={cancelCopyLongPress}
                   onTouchCancel={cancelCopyLongPress}
                   onMouseDown={isTouchDevice ? () => startCopyLongPress(description, 'desc') : undefined}
-                  onMouseUp={isTouchDevice ? cancelCopyLongPress : undefined}
+                  onMouseUp={isTouchDevice ? () => endCopyLongPress(description, 'desc') : undefined}
                   onMouseLeave={isTouchDevice ? cancelCopyLongPress : undefined}
                 >
                   {description}
