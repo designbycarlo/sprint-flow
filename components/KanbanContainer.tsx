@@ -23,6 +23,7 @@ import { ProjectSwitcher } from './ProjectSwitcher';
 import { HamburgerMenu } from './HamburgerMenu';
 import { SprintFlowLogo } from './SprintFlowLogo';
 import { LogOutButton } from './LogOutButton';
+import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
 import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
 
@@ -492,6 +493,8 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
           />
         </div>
       </header>
+
+      <WelcomeWidget />
 
       {/* Loading overlay when switching boards */}
       {isSwitching && (

@@ -1,7 +1,7 @@
 .board {
   display: flex;
   gap: 20px;
-  padding: 72px 20px 24px 20px;
+  padding: 132px 20px 24px 20px;
   overflow-x: auto;
   align-items: flex-start;
   min-height: 100vh;
@@ -14,6 +14,78 @@
 [data-theme="dark"] .board {
   background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
   color: #f7fafc;
+}
+
+.welcomeWidget {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 20px;
+  background: transparent;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  pointer-events: none;
+}
+
+.welcomeWidget > * {
+  pointer-events: auto;
+}
+
+.welcomeMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.welcomeGreeting {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a202c;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .welcomeGreeting {
+  color: #f7fafc;
+}
+
+.welcomeDivider {
+  color: #cbd5e0;
+  font-size: 12px;
+}
+
+[data-theme="dark"] .welcomeDivider {
+  color: #4a5568;
+}
+
+.welcomeDate {
+  font-size: 14px;
+  color: #718096;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .welcomeDate {
+  color: #a0aec0;
+}
+
+.welcomeTime {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a5568;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .welcomeTime {
+  color: #cbd5e0;
 }
 
 .column {
@@ -685,8 +757,31 @@ header.app-header {
 
   /* Card / column density on small screens */
   .board {
-    padding: 72px 12px 20px 12px;
+    padding: 128px 12px 20px 12px;
     gap: 14px;
+  }
+
+  .welcomeWidget {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .welcomeMain {
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .welcomeGreeting {
+    font-size: 14px;
+  }
+
+  .welcomeDate {
+    font-size: 12px;
+  }
+
+  .welcomeTime {
+    font-size: 13px;
   }
 
   .column {
@@ -722,6 +817,22 @@ header.app-header {
     max-width: calc(100% - 32px);
     margin: 0 16px;
     padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcomeDivider {
+    display: none;
+  }
+
+  .welcomeMain {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .welcomeDate {
+    font-size: 11px;
   }
 }
 
