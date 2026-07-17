@@ -2,6 +2,13 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
+  // Server Action POSTs must bypass session handling and be passed through
+  // untouched, otherwise the response content-type gets rewritten and the
+  // client throws "An unexpected response was received from the server."
+  if (request.headers.get('next-action')) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
