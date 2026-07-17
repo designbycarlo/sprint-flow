@@ -293,12 +293,35 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
               }
             }}
             title={isTouchDevice ? "Long press for details" : "Click to copy title"}
-            style={{ cursor: 'pointer' }}
+            style={{
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: copied === 'title' ? '#22c55e' : 'inherit',
+              transition: 'color 0.2s ease',
+            }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleTouchEnd}
           >
+            {copied === 'title' && !isTouchDevice && (
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                style={{ flexShrink: 0 }}
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
             {title}
           </h4>
           {description && (
@@ -316,27 +339,49 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                 }}
                 title={description}
                 aria-label={isTouchDevice ? "View description" : "Copy description"}
+                style={copied === 'desc' && !isTouchDevice ? { color: '#22c55e', transition: 'color 0.2s ease' } : undefined}
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <line x1="4" y1="7" x2="20" y2="7" />
-                  <line x1="4" y1="12" x2="20" y2="12" />
-                  <line x1="4" y1="17" x2="20" y2="17" />
-                </svg>
+                {copied === 'desc' && !isTouchDevice ? (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <line x1="4" y1="7" x2="20" y2="7" />
+                    <line x1="4" y1="12" x2="20" y2="12" />
+                    <line x1="4" y1="17" x2="20" y2="17" />
+                  </svg>
+                )}
               </button>
               {!isTouchDevice && (
                 <p
                   className={`${styles.cardDescription} ${styles.cardDescriptionCollapsed}`}
-                  style={{ margin: 0, cursor: 'pointer' }}
+                  style={{
+                    margin: 0,
+                    cursor: 'pointer',
+                    color: copied === 'desc' ? '#22c55e' : undefined,
+                    transition: 'color 0.2s ease',
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCopy(description, 'desc');
@@ -449,11 +494,6 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
           )}
         </div>
       </div>
-      {copied && (
-        <span className={styles.copiedBadge}>
-          {copied === 'title' ? 'Title' : 'Description'} copied
-        </span>
-      )}
 
       {showDetailView && typeof document !== 'undefined' && createPortal(
         <div
@@ -520,22 +560,45 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     alignItems: 'center',
                   }}
                 >
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                  </svg>
+                  {copied === 'title' ? (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                  )}
                 </button>
-                <span style={{ minWidth: 0, wordBreak: 'break-word' }}>
+                <span
+                  style={{
+                    minWidth: 0,
+                    wordBreak: 'break-word',
+                    color: copied === 'title' ? '#22c55e' : (isDark ? '#f7fafc' : '#1a202c'),
+                    transition: 'color 0.2s ease',
+                  }}
+                >
                   {title}
                 </span>
               </div>
@@ -580,20 +643,36 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                       alignItems: 'center',
                     }}
                   >
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                    </svg>
+                    {copied === 'desc' ? (
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                      >
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                      </svg>
+                    )}
                   </button>
                   <h4
                     style={{
@@ -622,25 +701,14 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     margin: 0,
                     fontSize: '16px',
                     lineHeight: '1.5',
-                    color: isDark ? '#e2e8f0' : '#2d3748',
+                    color: copied === 'desc' ? '#22c55e' : (isDark ? '#e2e8f0' : '#2d3748'),
+                    transition: 'color 0.2s ease',
                   }}
                 >
                   {description}
                 </p>
                 </div>
               </div>
-            )}
-            {copied && (
-              <p
-                style={{
-                  margin: '16px 0 0 0',
-                  fontSize: '13px',
-                  color: '#22c55e',
-                  textAlign: 'left',
-                }}
-              >
-                {copied === 'title' ? 'Title' : 'Description'} copied
-              </p>
             )}
           </div>
         </div>,
