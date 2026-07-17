@@ -77,6 +77,55 @@ export async function deleteCard(cardId: string) {
   return { success: true }
 }
 
+export async function duplicateCard(cardId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const { data: sourceCard, error: fetchError } = await supabase
+    .from('cards')
+    .select('column_id, title, description, position_index')
+    .eq('id', cardId)
+    .single()
+
+  if (fetchError || !sourceCard) {
+    console.error("Error fetching card to duplicate", fetchError)
+    throw new Error("Failed to duplicate card")
+  }
+
+  const { data: lastCard, error: countError } = await supabase
+    .from('cards')
+    .select('position_index')
+    .eq('column_id', sourceCard.column_id)
+    .order('position_index', { ascending: false })
+    .limit(1)
+
+  if (countError) {
+    console.error("Error counting cards", countError)
+    throw new Error("Failed to duplicate card")
+  }
+
+  const newPosition = lastCard && lastCard.length > 0 ? lastCard[0].position_index + 1 : 0
+
+  const { data, error } = await supabase
+    .from('cards')
+    .insert({
+      column_id: sourceCard.column_id,
+      title: `${sourceCard.title} (copy)`,
+      description: sourceCard.description || '',
+      position_index: newPosition
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error("Error duplicating card", error)
+    throw new Error("Failed to duplicate card")
+  }
+
+  return { success: true, card: data }
+}
+
 export async function updateCard(cardId: string, title: string, description?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

@@ -15,9 +15,10 @@ interface CardProps {
   onMoveCard: (cardId: string, newColumnId: string) => void;
   onEditCard?: (cardId: string, title: string, description?: string) => void;
   onDeleteCard?: (cardId: string) => void;
+  onDuplicateCard?: (cardId: string) => void;
 }
 
-export function Card({ id, title, description, currentColumnId, currentColumnTitle, columns, onMoveCard, onEditCard, onDeleteCard }: CardProps) {
+export function Card({ id, title, description, currentColumnId, currentColumnTitle, columns, onMoveCard, onEditCard, onDeleteCard, onDuplicateCard }: CardProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -110,6 +111,14 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     setShowMenu(false);
     if (onDeleteCard && confirm('Are you sure you want to delete this card?')) {
       await onDeleteCard(id);
+    }
+  };
+
+  const handleDuplicateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowMenu(false);
+    if (onDuplicateCard) {
+      onDuplicateCard(id);
     }
   };
 
@@ -413,7 +422,19 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                   Edit
                 </button>
               )}
-              
+
+              {onDuplicateCard && (
+                <button
+                  onClick={handleDuplicateClick}
+                  className={styles.cardMenuItem}
+                >
+                  <span style={{ marginRight: '8px' }}>⧉</span>
+                  Duplicate
+                </button>
+              )}
+
+              <div className={styles.menuSeparator}></div>
+
               {onDeleteCard && (
                 <button
                   onClick={handleDeleteClick}
@@ -448,6 +469,9 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
             justifyContent: 'center',
             padding: '16px',
             zIndex: 1000,
+            userSelect: 'none',
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
           }}
           onClick={() => setShowDetailView(false)}
         >

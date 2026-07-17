@@ -25,7 +25,7 @@ import { SprintFlowLogo } from './SprintFlowLogo';
 import { LogOutButton } from './LogOutButton';
 import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
-import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
+import { updateCardPosition, addCard, deleteCard, duplicateCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
 import { getCachedBoard, setCachedBoard, removeCachedBoard } from '@/utils/boardCache';
 
 export type CardData = {
@@ -181,6 +181,41 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
     } catch (err) {
       console.error(err);
       showToast('Failed to delete card', 'error');
+    }
+  };
+
+  const handleDuplicateCard = async (cardId: string) => {
+    const columnId = findColumnByCardId(cardId);
+    if (!columnId) return;
+    try {
+      const result = await duplicateCard(cardId);
+      if (result.success && result.card) {
+        const newCard = result.card;
+        const nextData: BoardData = {
+          ...data,
+          columns: {
+            ...data.columns,
+            [columnId]: {
+              ...data.columns[columnId],
+              cardIds: [...data.columns[columnId].cardIds, newCard.id]
+            }
+          },
+          cards: {
+            ...data.cards,
+            [newCard.id]: {
+              id: newCard.id,
+              title: newCard.title,
+              description: newCard.description || ''
+            }
+          }
+        };
+        setData(nextData);
+        setCachedBoard(activeBoardId, nextData);
+        showToast('Card duplicated successfully!', 'success');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to duplicate card', 'error');
     }
   };
 
@@ -595,6 +630,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
                         onMoveCard={handleMoveCard}
                         onEditCard={handleEditCard}
                         onDeleteCard={handleDeleteCard}
+                        onDuplicateCard={handleDuplicateCard}
                       />
                     ))
                   )}
