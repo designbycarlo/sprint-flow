@@ -26,6 +26,7 @@ import { LogOutButton } from './LogOutButton';
 import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
 import { updateCardPosition, addCard, deleteCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
+import { getCachedBoard, setCachedBoard, removeCachedBoard } from '@/utils/boardCache';
 
 export type CardData = {
   id: string;
@@ -103,7 +104,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
       const result = await addCard(columnId, newCardTitle.trim(), newCardDescription.trim());
       if (result.success && result.card) {
         const newCard = result.card;
-        setData({
+        const nextData: BoardData = {
           ...data,
           columns: {
             ...data.columns,
@@ -120,7 +121,9 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
               description: newCard.description || ''
             }
           }
-        });
+        };
+        setData(nextData);
+        setCachedBoard(activeBoardId, nextData);
         showToast('Card added successfully!', 'success');
         handleCancelAddCard();
       }
@@ -133,7 +136,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   const handleEditCard = async (cardId: string, title: string, description?: string) => {
     try {
       await updateCard(cardId, title, description);
-      setData({
+      const nextData: BoardData = {
         ...data,
         cards: {
           ...data.cards,
@@ -143,7 +146,9 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             description: description || ''
           }
         }
-      });
+      };
+      setData(nextData);
+      setCachedBoard(activeBoardId, nextData);
       showToast('Card updated successfully!', 'success');
     } catch (err) {
       console.error(err);
@@ -156,7 +161,9 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
       await deleteCard(cardId);
       const columnId = findColumnByCardId(cardId);
       if (columnId) {
-        setData({
+        const nextCards = { ...data.cards };
+        delete nextCards[cardId];
+        const nextData: BoardData = {
           ...data,
           columns: {
             ...data.columns,
@@ -165,11 +172,10 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
               cardIds: data.columns[columnId].cardIds.filter(id => id !== cardId)
             }
           },
-          cards: {
-            ...data.cards,
-            [cardId]: undefined as any
-          }
-        });
+          cards: nextCards
+        };
+        setData(nextData);
+        setCachedBoard(activeBoardId, nextData);
       }
       showToast('Card deleted successfully!', 'success');
     } catch (err) {
@@ -223,6 +229,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
 
     try {
       await updateCardPosition(cardId, newColumnId, newNewColumnCardIds.length - 1);
+      setCachedBoard(activeBoardId, newData);
       showToast("Card moved successfully!", "success");
     } catch (err) {
       console.error(err);
@@ -271,6 +278,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
 
       try {
         await updateCardPosition(activeId, overColumnId, newIndex);
+        setCachedBoard(activeBoardId, newData);
       } catch (err) {
         console.error(err);
         showToast("Update failed! Rolling back...", "error");
@@ -305,6 +313,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
 
       try {
         await updateCardPosition(activeId, overColumnId, insertIndex);
+        setCachedBoard(activeBoardId, newData);
       } catch (err) {
         console.error(err);
         showToast("Update failed! Rolling back...", "error");
@@ -317,8 +326,15 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
     if (boardId === activeBoardId || isSwitching) return;
     setIsSwitching(true);
     try {
+      const cached = getCachedBoard(boardId);
+      if (cached) {
+        setData(cached);
+        setActiveBoardId(boardId);
+        setAddingToColumn(null);
+      }
       const newData = await getBoardData(boardId);
       setData(newData);
+      setCachedBoard(boardId, newData);
       setActiveBoardId(boardId);
       setAddingToColumn(null);
     } catch (err) {
@@ -333,8 +349,15 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
     setCurrentBoards(prev => [...prev, newBoard]);
     setIsSwitching(true);
     try {
+      const cached = getCachedBoard(newBoard.id);
+      if (cached) {
+        setData(cached);
+        setActiveBoardId(newBoard.id);
+        setAddingToColumn(null);
+      }
       const newData = await getBoardData(newBoard.id);
       setData(newData);
+      setCachedBoard(newBoard.id, newData);
       setActiveBoardId(newBoard.id);
       setAddingToColumn(null);
     } catch (err) {
@@ -348,6 +371,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   const handleDeleteProject = async (boardId: string) => {
     try {
       await deleteBoard(boardId);
+      removeCachedBoard(boardId);
       const remaining = currentBoards.filter(b => b.id !== boardId);
       if (remaining.length === 0) {
         window.location.reload();

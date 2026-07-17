@@ -190,36 +190,6 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
     if (description) handleCopy(description, 'desc');
   };
 
-  const copyPressTimer = useRef<number | null>(null);
-  const copyLongPressFired = useRef(false);
-
-  const startCopyLongPress = (text: string, kind: 'title' | 'desc') => {
-    copyLongPressFired.current = false;
-    if (copyPressTimer.current) clearTimeout(copyPressTimer.current);
-    copyPressTimer.current = window.setTimeout(() => {
-      copyLongPressFired.current = true;
-    }, 500);
-  };
-
-  const endCopyLongPress = (text: string, kind: 'title' | 'desc') => {
-    if (copyPressTimer.current) {
-      clearTimeout(copyPressTimer.current);
-      copyPressTimer.current = null;
-    }
-    if (copyLongPressFired.current) {
-      copyLongPressFired.current = false;
-      handleCopy(text, kind);
-    }
-  };
-
-  const cancelCopyLongPress = () => {
-    if (copyPressTimer.current) {
-      clearTimeout(copyPressTimer.current);
-      copyPressTimer.current = null;
-    }
-    copyLongPressFired.current = false;
-  };
-
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${styles.card} ${sortableIsDragging ? styles.dragging : ''}`}>
@@ -508,26 +478,43 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                 gap: '12px',
               }}
             >
-              <span
-                style={{
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  transition: 'color 0.15s',
-                  color: copied === 'title' ? '#22c55e' : undefined,
-                }}
-                title="Long-press to copy title"
-                onClick={!isTouchDevice ? copyTitle : undefined}
-                onTouchStart={() => startCopyLongPress(title, 'title')}
-                onTouchEnd={() => endCopyLongPress(title, 'title')}
-                onTouchMove={cancelCopyLongPress}
-                onTouchCancel={cancelCopyLongPress}
-                onMouseDown={isTouchDevice ? () => startCopyLongPress(title, 'title') : undefined}
-                onMouseUp={isTouchDevice ? () => endCopyLongPress(title, 'title') : undefined}
-                onMouseLeave={isTouchDevice ? cancelCopyLongPress : undefined}
-              >
-                {title}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', minWidth: 0, flex: 1 }}>
+                <button
+                  type="button"
+                  onClick={copyTitle}
+                  title="Copy title"
+                  aria-label="Copy title"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: copied === 'title' ? '#22c55e' : (isDark ? '#a0aec0' : '#718096'),
+                    cursor: 'pointer',
+                    padding: '2px',
+                    flexShrink: 0,
+                    marginTop: '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                </button>
+                <span style={{ minWidth: 0, wordBreak: 'break-word' }}>
+                  {title}
+                </span>
+              </div>
               <button
                 onClick={() => setShowDetailView(false)}
                 style={{
@@ -545,18 +532,58 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
             </h3>
             {description && (
               <div style={{ overflowY: 'auto' }}>
-                <h4
+                <div
                   style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
                     margin: '0 0 8px 0',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: isDark ? '#a0aec0' : '#718096',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
                   }}
                 >
-                  Description
-                </h4>
+                  <button
+                    type="button"
+                    onClick={copyDescription}
+                    title="Copy description"
+                    aria-label="Copy description"
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: copied === 'desc' ? '#22c55e' : (isDark ? '#a0aec0' : '#718096'),
+                      cursor: 'pointer',
+                      padding: '2px',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                  </button>
+                  <h4
+                    style={{
+                      margin: 0,
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: isDark ? '#a0aec0' : '#718096',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    Description
+                  </h4>
+                </div>
                 <div
                   style={{
                     border: `1px dashed ${isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.12)'}`,
@@ -571,82 +598,25 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     margin: 0,
                     fontSize: '16px',
                     lineHeight: '1.5',
-                    color: copied === 'desc' ? '#22c55e' : (isDark ? '#e2e8f0' : '#2d3748'),
-                    cursor: 'pointer',
-                    userSelect: 'none',
-                    WebkitUserSelect: 'none',
-                    transition: 'color 0.15s',
+                    color: isDark ? '#e2e8f0' : '#2d3748',
                   }}
-                  title="Long-press to copy description"
-                  onClick={!isTouchDevice ? copyDescription : undefined}
-                  onTouchStart={() => startCopyLongPress(description, 'desc')}
-                  onTouchEnd={() => endCopyLongPress(description, 'desc')}
-                  onTouchMove={cancelCopyLongPress}
-                  onTouchCancel={cancelCopyLongPress}
-                  onMouseDown={isTouchDevice ? () => startCopyLongPress(description, 'desc') : undefined}
-                  onMouseUp={isTouchDevice ? () => endCopyLongPress(description, 'desc') : undefined}
-                  onMouseLeave={isTouchDevice ? cancelCopyLongPress : undefined}
                 >
                   {description}
                 </p>
                 </div>
               </div>
             )}
-            {isTouchDevice ? (
+            {copied && (
               <p
                 style={{
                   margin: '16px 0 0 0',
                   fontSize: '13px',
-                  color: copied ? '#22c55e' : '#a0aec0',
+                  color: '#22c55e',
                   textAlign: 'left',
                 }}
               >
-                {copied
-                  ? `${copied === 'title' ? 'Title' : 'Description'} copied`
-                  : '* Long-press the title or description to copy'}
+                {copied === 'title' ? 'Title' : 'Description'} copied
               </p>
-            ) : (
-              <div
-                style={{
-                  display: 'flex',
-                  gap: '8px',
-                  justifyContent: 'flex-end',
-                  marginTop: '20px',
-                }}
-              >
-                <button
-                  onClick={copyTitle}
-                  style={{
-                    padding: '8px 16px',
-                    border: isDark ? '1px solid #4a5568' : '1px solid #e2e8f0',
-                    borderRadius: '6px',
-                    background: isDark ? '#1a202c' : 'white',
-                    color: isDark ? '#e2e8f0' : '#4a5568',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Copy Title
-                </button>
-                {description && (
-                  <button
-                    onClick={copyDescription}
-                    style={{
-                      padding: '8px 16px',
-                      border: isDark ? '1px solid #718096' : '1px solid #e2e8f0',
-                      borderRadius: '6px',
-                      background: isDark ? '#718096' : '#4a5568',
-                      color: 'white',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Copy Description
-                  </button>
-                )}
-              </div>
             )}
           </div>
         </div>,
