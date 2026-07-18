@@ -1,4 +1,4 @@
-# <picture><source media="(prefers-color-scheme: dark)" srcset="./public/sprint-flow-logo.svg"/><img alt="Sprint Flow" src="./public/sprint-flow-logo.svg" width="220"/></picture>
+# <picture><source media="(prefers-color-scheme: dark)" srcset="./public/sprint-flow-logo-dark.svg"/><img alt="Sprint Flow" src="./public/sprint-flow-logo-light.svg" width="220"/></picture>
 
 > **Drag. Drop. Done.** — A Kanban board that keeps your sprint on track.
 

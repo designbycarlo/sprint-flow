@@ -15,7 +15,7 @@ export async function login(formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/login?error=' + encodeURIComponent(error.message))
+    redirect('/login?status=failed&error=' + encodeURIComponent(error.message))
   }
 
   revalidatePath('/', 'layout')
@@ -30,14 +30,18 @@ export async function signup(formData: FormData) {
     password: formData.get('password') as string,
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { data: signUpData, error } = await supabase.auth.signUp(data)
 
   if (error) {
-    redirect('/login?error=' + encodeURIComponent(error.message))
+    redirect('/login?status=failed&error=' + encodeURIComponent(error.message))
+  }
+
+  if (signUpData.user && signUpData.user.identities?.length === 0) {
+    redirect('/login?status=similar&error=' + encodeURIComponent('An account with this email already exists. Try logging in instead.'))
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/login?status=success&message=' + encodeURIComponent('Account created! Please check your email to confirm your account.'))
 }
 
 export async function signout() {

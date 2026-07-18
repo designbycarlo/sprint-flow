@@ -1,8 +1,9 @@
 import Image from 'next/image';
 import { PasswordInput } from '@/components/PasswordInput';
 import { LoginButtons } from '@/components/LoginButtons';
+import { LoginAlertHandler } from '@/components/LoginAlertHandler';
 
-export default async function LoginPage(props: { searchParams: Promise<{ error?: string }> }) {
+export default async function LoginPage(props: { searchParams: Promise<{ status?: string; error?: string; message?: string }> }) {
   const searchParams = await props.searchParams;
   return (
     <div
@@ -43,22 +44,11 @@ export default async function LoginPage(props: { searchParams: Promise<{ error?:
           Welcome to SprintFlow
         </h2>
 
-        {searchParams?.error && (
-          <div
-            style={{
-              color: '#e53e3e',
-              marginBottom: '20px',
-              textAlign: 'center',
-              fontSize: '0.875rem',
-              background: 'rgba(229, 62, 62, 0.05)',
-              padding: '10px 16px',
-              borderRadius: '10px',
-              border: '1px solid rgba(229, 62, 62, 0.15)',
-            }}
-          >
-            {searchParams.error}
-          </div>
-        )}
+        <LoginAlertHandler
+          status={searchParams?.status}
+          error={searchParams?.error}
+          message={searchParams?.message}
+        />
 
         <label
           htmlFor="email"
