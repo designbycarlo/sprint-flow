@@ -337,7 +337,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     handleCopy(description, 'desc');
                   }
                 }}
-                title={description}
+                title={isTouchDevice ? "Tap to view description" : "Click to copy description"}
                 aria-label={isTouchDevice ? "View description" : "Copy description"}
                 style={copied === 'desc' && !isTouchDevice ? { color: '#22c55e', transition: 'color 0.2s ease' } : undefined}
               >
@@ -379,6 +379,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     color: copied === 'desc' ? '#22c55e' : undefined,
                     transition: 'color 0.2s ease',
                   }}
+                  title="Click to copy description"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleCopy(description, 'desc');
@@ -527,19 +528,23 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3
+            <div
               style={{
-                margin: '0 0 16px 0',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: isDark ? '#f7fafc' : '#1a202c',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
                 gap: '12px',
+                marginBottom: '4px',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', minWidth: 0, flex: 1 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  margin: '0 0 8px 0',
+                }}
+              >
                 <button
                   type="button"
                   onClick={copyTitle}
@@ -552,7 +557,6 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     cursor: 'pointer',
                     padding: '2px',
                     flexShrink: 0,
-                    marginTop: '2px',
                     display: 'flex',
                     alignItems: 'center',
                   }}
@@ -588,16 +592,18 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     </svg>
                   )}
                 </button>
-                <span
+                <h4
                   style={{
-                    minWidth: 0,
-                    wordBreak: 'break-word',
-                    color: copied === 'title' ? '#22c55e' : (isDark ? '#f7fafc' : '#1a202c'),
-                    transition: 'color 0.2s ease',
+                    margin: 0,
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: isDark ? '#a0aec0' : '#718096',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.05em',
                   }}
                 >
-                  {title}
-                </span>
+                  Title
+                </h4>
               </div>
               <button
                 onClick={() => setShowDetailView(false)}
@@ -609,10 +615,23 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                   cursor: 'pointer',
                   padding: '0',
                   flexShrink: 0,
+                  lineHeight: 1,
                 }}
               >
                 ×
               </button>
+            </div>
+            <h3
+              style={{
+                margin: '0 0 16px 0',
+                fontSize: '18px',
+                fontWeight: '600',
+                color: copied === 'title' ? '#22c55e' : (isDark ? '#f7fafc' : '#1a202c'),
+                wordBreak: 'break-word',
+                transition: 'color 0.2s ease',
+              }}
+            >
+              {title}
             </h3>
             {description && (
               <div style={{ overflowY: 'auto' }}>
