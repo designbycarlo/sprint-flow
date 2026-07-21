@@ -378,6 +378,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     cursor: 'pointer',
                     color: copied === 'desc' ? '#22c55e' : undefined,
                     transition: 'color 0.2s ease',
+                    whiteSpace: 'pre-wrap',
                   }}
                   title="Click to copy description"
                   onClick={(e) => {
@@ -719,6 +720,7 @@ export function Card({ id, title, description, currentColumnId, currentColumnTit
                     lineHeight: '1.5',
                     color: copied === 'desc' ? '#22c55e' : (isDark ? '#e2e8f0' : '#2d3748'),
                     transition: 'color 0.2s ease',
+                    whiteSpace: 'pre-wrap',
                   }}
                 >
                   {description}
