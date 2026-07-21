@@ -2,7 +2,12 @@
 
 -- Helper: check if user can access a board by board_id
 CREATE OR REPLACE FUNCTION public.user_can_access_board_by_id(board_id UUID)
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.boards
@@ -17,7 +22,7 @@ BEGIN
       )
   );
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Create board_collaborators table
 CREATE TABLE IF NOT EXISTS public.board_collaborators (
@@ -32,12 +37,15 @@ CREATE TABLE IF NOT EXISTS public.board_collaborators (
 ALTER TABLE public.board_collaborators ENABLE ROW LEVEL SECURITY;
 
 -- Board collaborator policies
+DROP POLICY IF EXISTS "Board owners and collaborators can view collaborators" ON public.board_collaborators;
 CREATE POLICY "Board owners and collaborators can view collaborators" ON public.board_collaborators FOR SELECT USING (
   user_can_access_board_by_id(board_collaborators.board_id)
 );
+DROP POLICY IF EXISTS "Only board owner can invite collaborators" ON public.board_collaborators;
 CREATE POLICY "Only board owner can invite collaborators" ON public.board_collaborators FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM public.boards WHERE boards.id = board_collaborators.board_id AND boards.user_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Only board owner can remove collaborators" ON public.board_collaborators;
 CREATE POLICY "Only board owner can remove collaborators" ON public.board_collaborators FOR DELETE USING (
   EXISTS (SELECT 1 FROM public.boards WHERE boards.id = board_collaborators.board_id AND boards.user_id = auth.uid())
 );

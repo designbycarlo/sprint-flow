@@ -43,9 +43,14 @@ ALTER TABLE public.board_collaborators ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.columns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cards ENABLE ROW LEVEL SECURITY;
 
--- Helper: check if user can access a board by board_id
+-- Helper: check if user can access a board by board_id (SECURITY DEFINER to avoid RLS recursion)
 CREATE OR REPLACE FUNCTION public.user_can_access_board_by_id(board_id UUID)
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.boards
@@ -60,7 +65,7 @@ BEGIN
       )
   );
 END;
-$$ LANGUAGE plpgsql STABLE;
+$$;
 
 -- Create Policies for Boards
 CREATE POLICY "Users can view boards they own or collaborate on" ON public.boards FOR SELECT USING (
