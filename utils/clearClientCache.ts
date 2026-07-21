@@ -1,4 +1,4 @@
-const PRESERVE_KEYS = ['theme'];
+const PRESERVE_KEYS = ['theme', 'lastBoardId'];
 
 export async function clearClientCache(): Promise<void> {
   if (typeof window === 'undefined') return;

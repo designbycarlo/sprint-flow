@@ -48,9 +48,6 @@ export async function signout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('lastBoardId')
-  }
   redirect('/login')
 }
 
