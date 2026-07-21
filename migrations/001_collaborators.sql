@@ -52,6 +52,7 @@ CREATE POLICY "Only board owner can remove collaborators" ON public.board_collab
 
 -- Update Board Policies
 DROP POLICY IF EXISTS "Users can view their own boards" ON public.boards;
+DROP POLICY IF EXISTS "Users can view boards they own or collaborate on" ON public.boards;
 CREATE POLICY "Users can view boards they own or collaborate on" ON public.boards FOR SELECT USING (
   boards.user_id = auth.uid() OR EXISTS (
     SELECT 1 FROM public.board_collaborators WHERE board_id = boards.id AND user_id = auth.uid()
@@ -59,6 +60,7 @@ CREATE POLICY "Users can view boards they own or collaborate on" ON public.board
 );
 
 DROP POLICY IF EXISTS "Users can update their own boards" ON public.boards;
+DROP POLICY IF EXISTS "Users can update boards they own or collaborate on" ON public.boards;
 CREATE POLICY "Users can update boards they own or collaborate on" ON public.boards FOR UPDATE USING (
   boards.user_id = auth.uid() OR EXISTS (
     SELECT 1 FROM public.board_collaborators WHERE board_id = boards.id AND user_id = auth.uid()
@@ -66,31 +68,37 @@ CREATE POLICY "Users can update boards they own or collaborate on" ON public.boa
 );
 
 DROP POLICY IF EXISTS "Users can delete their own boards" ON public.boards;
+DROP POLICY IF EXISTS "Users can delete only their own boards" ON public.boards;
 CREATE POLICY "Users can delete only their own boards" ON public.boards FOR DELETE USING (auth.uid() = boards.user_id);
 
 -- Update Column Policies
 DROP POLICY IF EXISTS "Users can view columns of their boards" ON public.columns;
+DROP POLICY IF EXISTS "Users can view columns of accessible boards" ON public.columns;
 CREATE POLICY "Users can view columns of accessible boards" ON public.columns FOR SELECT USING (
   user_can_access_board_by_id(columns.board_id)
 );
 
 DROP POLICY IF EXISTS "Users can insert columns to their boards" ON public.columns;
+DROP POLICY IF EXISTS "Users can insert columns to boards they own" ON public.columns;
 CREATE POLICY "Users can insert columns to boards they own" ON public.columns FOR INSERT WITH CHECK (
   EXISTS (SELECT 1 FROM public.boards WHERE boards.id = columns.board_id AND boards.user_id = auth.uid())
 );
 
 DROP POLICY IF EXISTS "Users can update columns of their boards" ON public.columns;
+DROP POLICY IF EXISTS "Users can update columns of accessible boards" ON public.columns;
 CREATE POLICY "Users can update columns of accessible boards" ON public.columns FOR UPDATE USING (
   user_can_access_board_by_id(columns.board_id)
 );
 
 DROP POLICY IF EXISTS "Users can delete columns of their boards" ON public.columns;
+DROP POLICY IF EXISTS "Users can delete columns of accessible boards" ON public.columns;
 CREATE POLICY "Users can delete columns of accessible boards" ON public.columns FOR DELETE USING (
   user_can_access_board_by_id(columns.board_id)
 );
 
 -- Update Card Policies
 DROP POLICY IF EXISTS "Users can view cards in their columns" ON public.cards;
+DROP POLICY IF EXISTS "Users can view cards in accessible boards" ON public.cards;
 CREATE POLICY "Users can view cards in accessible boards" ON public.cards FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM public.columns
@@ -100,6 +108,7 @@ CREATE POLICY "Users can view cards in accessible boards" ON public.cards FOR SE
 );
 
 DROP POLICY IF EXISTS "Users can insert cards in their columns" ON public.cards;
+DROP POLICY IF EXISTS "Users can insert cards in accessible boards" ON public.cards;
 CREATE POLICY "Users can insert cards in accessible boards" ON public.cards FOR INSERT WITH CHECK (
   EXISTS (
     SELECT 1 FROM public.columns
@@ -109,6 +118,7 @@ CREATE POLICY "Users can insert cards in accessible boards" ON public.cards FOR 
 );
 
 DROP POLICY IF EXISTS "Users can update cards in their columns" ON public.cards;
+DROP POLICY IF EXISTS "Users can update cards in accessible boards" ON public.cards;
 CREATE POLICY "Users can update cards in accessible boards" ON public.cards FOR UPDATE USING (
   EXISTS (
     SELECT 1 FROM public.columns
@@ -118,6 +128,7 @@ CREATE POLICY "Users can update cards in accessible boards" ON public.cards FOR 
 );
 
 DROP POLICY IF EXISTS "Users can delete cards in their columns" ON public.cards;
+DROP POLICY IF EXISTS "Users can delete cards in accessible boards" ON public.cards;
 CREATE POLICY "Users can delete cards in accessible boards" ON public.cards FOR DELETE USING (
   EXISTS (
     SELECT 1 FROM public.columns
