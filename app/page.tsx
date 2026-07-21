@@ -9,6 +9,12 @@ export default async function Home() {
 
   if (!user) return null
 
+  // Get the last viewed board from localStorage
+  let lastBoardId = null
+  if (typeof window !== 'undefined') {
+    lastBoardId = localStorage.getItem('lastBoardId')
+  }
+
   // Fetch all boards for this user
   const { data: allBoards } = await supabase.from('boards').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
   
@@ -53,8 +59,9 @@ export default async function Home() {
     }
   }
 
-  // Use the first board as the current board
-  const currentBoard = boards[0]
+  // Use the last viewed board if available, otherwise fallback to first board
+  const lastBoard = lastBoardId ? boards.find(b => b.id === lastBoardId) : null
+  const currentBoard = lastBoard || boards[0]
 
   const { data: columns } = await supabase.from('columns').select('*').eq('board_id', currentBoard.id).order('position_index', { ascending: true })
   

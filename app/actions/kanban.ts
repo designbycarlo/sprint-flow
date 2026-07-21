@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { saveLastBoard } from '@/app/login/actions'
 
 export async function updateCardPosition(cardId: string, newColumnId: string, newIndex: number) {
   const supabase = await createClient()
@@ -234,6 +235,8 @@ export async function createBoard(title: string) {
     { board_id: newBoard.id, title: 'Done', position_index: 2 }
   ]).select()
 
+  await saveLastBoard(newBoard.id)
+
   return { success: true, board: newBoard, columns: cols }
 }
 
@@ -259,6 +262,8 @@ export async function renameBoard(boardId: string, title: string) {
   }
 
   revalidatePath('/')
+
+  await saveLastBoard(boardId)
 
   return { success: true }
 }
