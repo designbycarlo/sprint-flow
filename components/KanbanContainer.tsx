@@ -26,7 +26,7 @@ import { LogOutButton } from './LogOutButton';
 import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
 import { updateCardPosition, addCard, deleteCard, duplicateCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
-import { getCachedBoard, setCachedBoard, removeCachedBoard } from '@/utils/boardCache';
+import { getCachedBoard, setCachedBoard, removeCachedBoard, clearBoardCache } from '@/utils/boardCache';
 
 export type CardData = {
   id: string;
