@@ -1,4 +1,5 @@
 import { KanbanContainer } from '@/components/KanbanContainer'
+import { getBoardsForUser } from '@/app/actions/kanban'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function Home() {
@@ -15,9 +16,8 @@ export default async function Home() {
     lastBoardId = localStorage.getItem('lastBoardId')
   }
 
-  // Fetch all boards for this user
-  const { data: allBoards } = await supabase.from('boards').select('*').eq('user_id', user.id).order('created_at', { ascending: true })
-  
+  // Fetch all boards this user can access (owned + shared)
+  const allBoards = await getBoardsForUser()
   let boards = allBoards || []
   
   if (boards.length === 0) {
@@ -102,7 +102,9 @@ export default async function Home() {
   const serializedBoards = boards.map(b => ({
     id: b.id,
     title: b.title,
-    created_at: b.created_at
+    created_at: b.created_at,
+    is_owner: b.is_owner,
+    owner_id: b.owner_id,
   }))
 
   return (

@@ -22,6 +22,7 @@ import { ProjectMenu } from './ProjectMenu';
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { HamburgerMenu } from './HamburgerMenu';
 import { SprintFlowLogo } from './SprintFlowLogo';
+import { ShareBoardDialog } from './ShareBoardDialog';
 import { LogOutButton } from './LogOutButton';
 import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
@@ -50,6 +51,8 @@ type BoardInfo = {
   id: string;
   title: string;
   created_at: string;
+  is_owner: boolean;
+  owner_id: string;
 };
 
 interface KanbanContainerProps {
@@ -75,6 +78,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   const [newProjectTitle, setNewProjectTitle] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -520,6 +524,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
           <div className={styles.desktopOnly}>
             <ProjectMenu
               onNewProjectClick={handleOpenNewProject}
+              onShareClick={() => setShowShareDialog(true)}
               onDeleteProjectClick={handleOpenDeleteProject}
               activeBoardTitle={activeBoard?.title || ''}
               boardCount={currentBoards.length}
@@ -531,6 +536,36 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             onSwitchBoard={handleSwitchBoard}
             onRenameBoard={handleRenameProject}
           />
+          <button
+            onClick={() => setShowShareDialog(true)}
+            className={styles.desktopOnly}
+            style={{
+              background: 'transparent',
+              border: '1px solid #e2e8f0',
+              borderRadius: '6px',
+              padding: '4px 10px',
+              fontSize: '12px',
+              fontWeight: 500,
+              color: '#4a5568',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontFamily: 'inherit',
+              flexShrink: 0,
+              transition: 'background 0.15s ease',
+            }}
+            title="Share board"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+            </svg>
+            Share
+          </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <div className={styles.desktopOnly}>
@@ -542,6 +577,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             onSwitchBoard={handleSwitchBoard}
             onNewProjectClick={handleOpenNewProject}
             onDeleteProjectClick={handleOpenDeleteProject}
+            onShareClick={() => setShowShareDialog(true)}
             boardCount={currentBoards.length}
             activeBoardTitle={activeBoard?.title || ''}
           />
@@ -682,6 +718,15 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             </div>
           </div>
         </div>
+      )}
+
+      {/* Share Board Dialog */}
+      {showShareDialog && (
+        <ShareBoardDialog
+          boardId={activeBoardId}
+          isOwner={activeBoard ? activeBoard.is_owner : true}
+          onClose={() => setShowShareDialog(false)}
+        />
       )}
 
       {/* Delete Confirmation Dialog */}

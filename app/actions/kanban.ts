@@ -286,3 +286,158 @@ export async function deleteBoard(boardId: string) {
 
   return { success: true }
 }
+
+// --- Collaboration ---
+
+export async function inviteCollaborator(boardId: string, email: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const trimmedEmail = email.trim().toLowerCase()
+  if (!trimmedEmail) throw new Error("Email is required")
+
+  // Look up user by email via the SECURITY DEFINER function
+  const { data: targetUserId, error: lookupError } = await supabase
+    .rpc('get_user_id_by_email', { target_email: trimmedEmail })
+
+  if (lookupError || !targetUserId) {
+    console.error("Error looking up user", lookupError)
+    throw new Error("No SprintFlow account found with this email")
+  }
+
+  if (targetUserId === user.id) {
+    throw new Error("You cannot invite yourself")
+  }
+
+  // Verify the caller owns this board
+  const { data: board } = await supabase
+    .from('boards')
+    .select('user_id')
+    .eq('id', boardId)
+    .single()
+
+  if (!board || board.user_id !== user.id) {
+    throw new Error("Only the board owner can invite collaborators")
+  }
+
+  const { error: insertError } = await supabase
+    .from('board_collaborators')
+    .insert({
+      board_id: boardId,
+      user_id: targetUserId,
+      invited_by: user.id,
+    })
+
+  if (insertError) {
+    if (insertError.code === '23505') {
+      throw new Error("This user is already a collaborator on this board")
+    }
+    console.error("Error inviting collaborator", insertError)
+    throw new Error("Failed to invite collaborator")
+  }
+
+  revalidatePath('/')
+
+  return { success: true, userId: targetUserId }
+}
+
+export async function removeCollaborator(boardId: string, userId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const { error } = await supabase
+    .from('board_collaborators')
+    .delete()
+    .eq('board_id', boardId)
+    .eq('user_id', userId)
+
+  if (error) {
+    console.error("Error removing collaborator", error)
+    throw new Error("Failed to remove collaborator")
+  }
+
+  revalidatePath('/')
+
+  return { success: true }
+}
+
+export async function getCollaborators(boardId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  const { data, error } = await supabase
+    .from('board_collaborators')
+    .select('user_id, invited_by, created_at')
+    .eq('board_id', boardId)
+
+  if (error) {
+    console.error("Error fetching collaborators", error)
+    throw new Error("Failed to fetch collaborators")
+  }
+
+  if (!data || data.length === 0) return []
+
+  // Batch fetch all user emails
+  const userIds = data.map(c => c.user_id)
+  const { data: emailsData } = await supabase
+    .rpc('get_users_emails', { user_ids: userIds })
+
+  const emailMap: Record<string, string> = {}
+  if (emailsData) {
+    for (const row of emailsData) {
+      emailMap[row.user_id] = row.email
+    }
+  }
+
+  // Also get the inviting users' emails for display
+  const inviterIds = data.map(c => c.invited_by).filter(Boolean) as string[]
+  const { data: inviterData } = inviterIds.length > 0
+    ? await supabase.rpc('get_users_emails', { user_ids: inviterIds })
+    : { data: null }
+
+  const inviterMap: Record<string, string> = {}
+  if (inviterData) {
+    for (const row of inviterData) {
+      inviterMap[row.user_id] = row.email
+    }
+  }
+
+  return data.map(c => ({
+    userId: c.user_id,
+    email: emailMap[c.user_id] || 'Unknown',
+    invitedBy: c.invited_by,
+    invitedByEmail: inviterMap[c.invited_by] || 'Unknown',
+    createdAt: c.created_at,
+  }))
+}
+
+export async function getBoardsForUser() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("Unauthorized")
+
+  // RLS will return boards the user owns or collaborates on
+  const { data, error } = await supabase
+    .from('boards')
+    .select('*')
+    .order('created_at', { ascending: true })
+
+  if (error) {
+    console.error("Error fetching boards", error)
+    throw new Error("Failed to fetch boards")
+  }
+
+  // Annotate each board with ownership info
+  const annotated = (data || []).map(b => ({
+    id: b.id,
+    title: b.title,
+    created_at: b.created_at,
+    is_owner: b.user_id === user.id,
+    owner_id: b.user_id,
+  }))
+
+  return annotated
+}
