@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { clearBoardCache } from '@/utils/boardCache'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -47,6 +48,9 @@ export async function signup(formData: FormData) {
 export async function signout() {
   const supabase = await createClient()
   await supabase.auth.signOut()
+  
+  clearBoardCache()
+  
   revalidatePath('/', 'layout')
   redirect('/login')
 }

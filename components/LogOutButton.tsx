@@ -2,10 +2,12 @@
 
 import { signout } from "@/app/login/actions";
 import { clearClientCache } from "@/utils/clearClientCache";
+import { clearBoardCache } from "@/utils/boardCache";
 
 export function LogOutButton() {
   const handleClick = () => {
     void clearClientCache();
+    clearBoardCache();
   };
 
   return (

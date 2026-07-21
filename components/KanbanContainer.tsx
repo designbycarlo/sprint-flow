@@ -361,12 +361,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
     if (boardId === activeBoardId || isSwitching) return;
     setIsSwitching(true);
     try {
-      const cached = getCachedBoard(boardId);
-      if (cached) {
-        setData(cached);
-        setActiveBoardId(boardId);
-        setAddingToColumn(null);
-      }
+      clearBoardCache();
       const newData = await getBoardData(boardId);
       setData(newData);
       setCachedBoard(boardId, newData);
