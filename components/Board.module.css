@@ -797,7 +797,6 @@ header.app-header .desktopOnly > :global(form) {
   .projectSwitcherContainer {
     min-width: 0;
     flex: 1 1 auto;
-    overflow: hidden;
   }
 
   .projectSwitcherBtn {

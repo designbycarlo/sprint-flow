@@ -67,26 +67,6 @@ export function HamburgerMenu({
 
       {isOpen && (
         <div className={styles.hamburgerPanel} role="menu">
-          <div className={styles.hamburgerSectionLabel}>Switch Project</div>
-          {boards.map((board) => (
-            <button
-              key={board.id}
-              role="menuitem"
-              className={`${styles.hamburgerItem} ${board.id === currentBoardId ? styles.hamburgerItemActive : ''}`}
-              onClick={() => {
-                onSwitchBoard(board.id);
-                setIsOpen(false);
-              }}
-            >
-              <span className={styles.hamburgerItemTitle}>{board.title}</span>
-              {board.id === currentBoardId && (
-                <span className={styles.projectSwitcherCheck}>✓</span>
-              )}
-            </button>
-          ))}
-
-          <div className={styles.menuSeparator}></div>
-
           <button
             role="menuitem"
             className={styles.hamburgerItem}

@@ -579,7 +579,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             Share
           </button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div className={styles.desktopOnly}>
             <NotificationBell onBoardClick={handleSwitchBoard} />
           </div>

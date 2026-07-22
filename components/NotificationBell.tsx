@@ -60,14 +60,15 @@ export function NotificationBell({ onBoardClick }: NotificationBellProps) {
   }
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
       <button
         onClick={() => setOpen(!open)}
         style={{
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          padding: '4px',
+          width: '32px',
+          height: '32px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -76,7 +77,7 @@ export function NotificationBell({ onBoardClick }: NotificationBellProps) {
           transition: 'color 0.15s ease, background 0.15s ease',
           position: 'relative',
         }}
-        onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-primary, #1a202c)'; e.currentTarget.style.background = 'rgba(0,0,0,0.04)' }}
+        onMouseOver={(e) => { e.currentTarget.style.color = 'var(--text-primary, #1a202c)'; e.currentTarget.style.background = 'rgba(0,0,0,0.05)' }}
         onMouseOut={(e) => { e.currentTarget.style.color = 'var(--text-secondary, #718096)'; e.currentTarget.style.background = 'transparent' }}
         aria-label="Notifications"
       >
@@ -88,20 +89,21 @@ export function NotificationBell({ onBoardClick }: NotificationBellProps) {
           <span
             style={{
               position: 'absolute',
-              top: '-2px',
-              right: '-4px',
+              top: '0px',
+              right: '0px',
               background: '#e53e3e',
               color: '#fff',
               fontSize: '10px',
               fontWeight: 700,
-              minWidth: '16px',
-              height: '16px',
+              minWidth: '15px',
+              height: '15px',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '0 4px',
+              padding: '0 3px',
               lineHeight: 1,
+              border: '1.5px solid var(--dialog-bg, #fff)',
             }}
           >
             {unreadCount > 9 ? '9+' : unreadCount}

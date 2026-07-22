@@ -22,32 +22,33 @@ function getInitials(email: string): string {
   return parts.map(p => p.charAt(0).toUpperCase()).filter(Boolean).slice(0, 2).join('');
 }
 
-export function UserAvatar({ email, onClick }: { email: string; onClick?: () => void }) {
+export function UserAvatar({ email, onClick, size = 32 }: { email: string; onClick?: () => void; size?: number }) {
   const initials = getInitials(email);
   const bgColor = avatarColors[hashEmail(email) % avatarColors.length];
+  const fontSize = Math.max(10, Math.round(size * 0.375));
 
   return (
     <div
       onClick={onClick}
       style={{
-        width: '30px',
-        height: '30px',
+        width: `${size}px`,
+        height: `${size}px`,
         borderRadius: '50%',
         backgroundColor: bgColor,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '11px',
-        fontWeight: 700,
+        fontSize: `${fontSize}px`,
+        fontWeight: 600,
         color: '#fff',
         flexShrink: 0,
         userSelect: 'none',
         lineHeight: 1,
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'opacity 0.15s ease',
+        transition: 'opacity 0.15s ease, transform 0.15s ease',
       }}
       title={email}
-      onMouseOver={(e) => { if (onClick) e.currentTarget.style.opacity = '0.8' }}
+      onMouseOver={(e) => { if (onClick) e.currentTarget.style.opacity = '0.85' }}
       onMouseOut={(e) => { if (onClick) e.currentTarget.style.opacity = '1' }}
     >
       {initials}
