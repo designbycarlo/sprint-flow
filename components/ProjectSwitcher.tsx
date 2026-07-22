@@ -1,11 +1,15 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import styles from './Board.module.css';
+import { UserAvatar } from './UserAvatar';
 
 interface Board {
   id: string;
   title: string;
   created_at: string;
+  is_owner?: boolean;
+  owner_id?: string;
+  owner_email?: string;
 }
 
 interface ProjectSwitcherProps {
@@ -23,6 +27,16 @@ export function ProjectSwitcher({ boards, currentBoardId, onSwitchBoard, onRenam
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentBoard = boards.find(b => b.id === currentBoardId);
+
+  const { ownedBoards, sharedBoards } = useMemo(() => {
+    const owned: Board[] = []
+    const shared: Board[] = []
+    for (const b of boards) {
+      if (b.is_owner) owned.push(b)
+      else shared.push(b)
+    }
+    return { ownedBoards: owned, sharedBoards: shared }
+  }, [boards])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -78,6 +92,27 @@ export function ProjectSwitcher({ boards, currentBoardId, onSwitchBoard, onRenam
     }
   };
 
+  function renderBoardItem(board: Board) {
+    return (
+      <button
+        key={board.id}
+        role="option"
+        aria-selected={board.id === currentBoardId}
+        className={`${styles.projectSwitcherItem} ${board.id === currentBoardId ? styles.projectSwitcherItemActive : ''}`}
+        onClick={() => handleSelectBoard(board.id)}
+        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+      >
+        {board.owner_email && !board.is_owner && (
+          <UserAvatar email={board.owner_email} />
+        )}
+        <span className={styles.projectSwitcherItemTitle} style={{ flex: 1 }}>{board.title}</span>
+        {board.id === currentBoardId && (
+          <span className={styles.projectSwitcherCheck}>✓</span>
+        )}
+      </button>
+    )
+  }
+
   return (
     <div className={styles.projectSwitcherContainer} ref={dropdownRef}>
       <button
@@ -119,24 +154,34 @@ export function ProjectSwitcher({ boards, currentBoardId, onSwitchBoard, onRenam
 
       {isOpen && (
         <div className={styles.projectSwitcherDropdown} role="listbox">
-          {boards.map((board) => (
-            <button
-              key={board.id}
-              role="option"
-              aria-selected={board.id === currentBoardId}
-              className={`${styles.projectSwitcherItem} ${board.id === currentBoardId ? styles.projectSwitcherItemActive : ''}`}
-              onClick={() => handleSelectBoard(board.id)}
-            >
-              <span className={styles.projectSwitcherItemTitle}>{board.title}</span>
-              {board.id === currentBoardId && (
-                <span className={styles.projectSwitcherCheck}>✓</span>
-              )}
-            </button>
-          ))}
+          {ownedBoards.map(renderBoardItem)}
+          {sharedBoards.length > 0 && (
+            <>
+              <div
+                style={{
+                  height: '1px',
+                  background: 'var(--border-color, #e2e8f0)',
+                  margin: '4px 8px',
+                }}
+              />
+              <div
+                style={{
+                  padding: '4px 12px 2px',
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary, #a0aec0)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Shared with me
+              </div>
+              {sharedBoards.map(renderBoardItem)}
+            </>
+          )}
         </div>
       )}
 
-      {/* Rename Project Dialog */}
       {showRenameDialog && (
         <div className={styles.dialogOverlay} onClick={closeRename}>
           <div className={styles.dialogContent} onClick={(e) => e.stopPropagation()}>

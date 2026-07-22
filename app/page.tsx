@@ -105,6 +105,7 @@ export default async function Home() {
     created_at: b.created_at,
     is_owner: b.is_owner,
     owner_id: b.owner_id,
+    owner_email: b.owner_email,
   }))
 
   return (

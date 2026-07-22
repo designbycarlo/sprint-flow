@@ -313,7 +313,7 @@ export async function inviteCollaborator(boardId: string, email: string) {
   // Verify the caller owns this board
   const { data: board } = await supabase
     .from('boards')
-    .select('user_id')
+    .select('user_id, title')
     .eq('id', boardId)
     .single()
 
@@ -338,6 +338,16 @@ export async function inviteCollaborator(boardId: string, email: string) {
     console.error("Error inviting collaborator", insertError)
     throw new Error("Failed to invite collaborator")
   }
+
+  const actorName = (user.email?.split('@')[0] || '').replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+
+  await supabase.from('notifications').insert({
+    user_id: targetUserId,
+    board_id: boardId,
+    board_title: board.title,
+    actor_name: actorName,
+    actor_email: user.email || '',
+  })
 
   revalidatePath('/')
 
@@ -443,7 +453,6 @@ export async function getBoardsForUser() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 
-  // RLS will return boards the user owns or collaborates on
   const { data, error } = await supabase
     .from('boards')
     .select('*')
@@ -454,14 +463,107 @@ export async function getBoardsForUser() {
     throw new Error("Failed to fetch boards")
   }
 
-  // Annotate each board with ownership info
-  const annotated = (data || []).map(b => ({
+  const boards = data || []
+
+  const ownerIds = [...new Set(boards.map(b => b.user_id).filter(id => id !== user.id))] as string[]
+  const ownerEmailMap: Record<string, string> = {}
+  if (ownerIds.length > 0) {
+    const { data: jsonData } = await supabase
+      .rpc('get_users_emails_json', { user_ids: JSON.stringify(ownerIds) })
+    if (jsonData && jsonData.length > 0) {
+      for (const row of jsonData) {
+        ownerEmailMap[row.user_id] = row.email
+      }
+    } else {
+      const { data: arrayData } = await supabase
+        .rpc('get_users_emails', { user_ids: ownerIds })
+      if (arrayData && arrayData.length > 0) {
+        for (const row of arrayData) {
+          ownerEmailMap[row.user_id] = row.email
+        }
+      } else {
+        const results = await Promise.allSettled(
+          ownerIds.map(id =>
+            supabase.rpc('get_user_email_by_id', { user_id: id })
+              .then(r => ({ id, email: r.data }))
+          )
+        )
+        for (const r of results) {
+          if (r.status === 'fulfilled' && r.value.email) {
+            ownerEmailMap[r.value.id] = r.value.email as unknown as string
+          }
+        }
+      }
+    }
+  }
+
+  const annotated = boards.map(b => ({
     id: b.id,
     title: b.title,
     created_at: b.created_at,
     is_owner: b.user_id === user.id,
     owner_id: b.user_id,
+    owner_email: b.user_id === user.id ? (user.email || '') : (ownerEmailMap[b.user_id] || ''),
   }))
 
   return annotated
+}
+
+export interface Notification {
+  id: string
+  board_id: string
+  board_title: string
+  actor_name: string
+  actor_email: string
+  read: boolean
+  created_at: string
+}
+
+export async function getNotifications(): Promise<Notification[]> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data } = await supabase
+    .from('notifications')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  return (data || []).map(n => ({
+    id: n.id,
+    board_id: n.board_id,
+    board_title: n.board_title,
+    actor_name: n.actor_name,
+    actor_email: n.actor_email,
+    read: n.read,
+    created_at: n.created_at,
+  }))
+}
+
+export async function markNotificationRead(notificationId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('notifications')
+    .update({ read: true })
+    .eq('id', notificationId)
+
+  if (error) {
+    console.error("Error marking notification as read", error)
+  }
+}
+
+export async function getUnreadCount(): Promise<number> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return 0
+
+  const { count } = await supabase
+    .from('notifications')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('read', false)
+
+  return count || 0
 }

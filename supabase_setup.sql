@@ -200,6 +200,32 @@ BEGIN
 END;
 $$;
 
+-- Create notifications table
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    board_id UUID REFERENCES public.boards(id) ON DELETE CASCADE NOT NULL,
+    board_title TEXT NOT NULL,
+    actor_name TEXT NOT NULL,
+    actor_email TEXT NOT NULL,
+    read BOOLEAN DEFAULT false NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notifications"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Authenticated users can insert notifications"
+  ON public.notifications FOR INSERT
+  WITH CHECK (auth.role() = 'authenticated');
+
 -- Function to create a default board for new users automatically
 CREATE OR REPLACE FUNCTION public.handle_new_user() 
 RETURNS TRIGGER AS $$

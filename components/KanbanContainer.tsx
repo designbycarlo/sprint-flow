@@ -24,6 +24,7 @@ import { HamburgerMenu } from './HamburgerMenu';
 import { SprintFlowLogo } from './SprintFlowLogo';
 import { ShareBoardDialog } from './ShareBoardDialog';
 import { LogOutButton } from './LogOutButton';
+import { NotificationBell } from './NotificationBell';
 import { UserAvatar } from './UserAvatar';
 import { ProfileModal } from './ProfileModal';
 import { WelcomeWidget } from './WelcomeWidget';
@@ -55,6 +56,7 @@ type BoardInfo = {
   created_at: string;
   is_owner: boolean;
   owner_id: string;
+  owner_email?: string;
 };
 
 interface KanbanContainerProps {
@@ -572,7 +574,10 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             Share
           </button>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className={styles.desktopOnly}>
+            <NotificationBell onBoardClick={handleSwitchBoard} />
+          </div>
           {userEmail && (
             <div className={styles.desktopOnly}>
               <UserAvatar email={userEmail} onClick={() => setShowProfileModal(true)} />
