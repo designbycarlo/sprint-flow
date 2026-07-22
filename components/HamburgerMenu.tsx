@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './Board.module.css';
 import { LogOutButton } from './LogOutButton';
+import { UserAvatar } from './UserAvatar';
 
 interface Board {
   id: string;
@@ -18,6 +19,8 @@ interface HamburgerMenuProps {
   onShareClick: () => void;
   boardCount: number;
   activeBoardTitle: string;
+  userEmail?: string;
+  onAvatarClick?: () => void;
 }
 
 export function HamburgerMenu({
@@ -29,6 +32,8 @@ export function HamburgerMenu({
   onShareClick,
   boardCount,
   activeBoardTitle,
+  userEmail,
+  onAvatarClick,
 }: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -133,6 +138,22 @@ export function HamburgerMenu({
           </button>
 
           <div className={styles.menuSeparator}></div>
+
+          {userEmail && (
+            <div
+              className={styles.hamburgerItem}
+              onClick={() => {
+                onAvatarClick?.();
+                setIsOpen(false);
+              }}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 14px' }}
+            >
+              <UserAvatar email={userEmail} />
+              <span style={{ fontSize: '13px', color: 'var(--text-primary, #1a202c)', fontWeight: 500 }}>
+                Profile
+              </span>
+            </div>
+          )}
 
           <div className={styles.hamburgerLogout}>
             <LogOutButton />

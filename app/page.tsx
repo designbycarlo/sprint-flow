@@ -113,6 +113,8 @@ export default async function Home() {
         initialData={initialData} 
         boards={serializedBoards}
         currentBoardId={currentBoard.id}
+        userEmail={user.email ?? undefined}
+        userCreatedAt={user.created_at}
       />
     </main>
   );

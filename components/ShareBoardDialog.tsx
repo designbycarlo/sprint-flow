@@ -86,12 +86,12 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
         <h3 className={styles.dialogTitle}>Share Board</h3>
 
         {error && (
-          <p style={{ color: '#e53e3e', fontSize: '13px', margin: '0 0 12px 0' }}>
+          <p style={{ color: 'var(--text-error, #e53e3e)', fontSize: '13px', margin: '0 0 12px 0' }}>
             {error}
           </p>
         )}
         {success && (
-          <p style={{ color: '#38a169', fontSize: '13px', margin: '0 0 12px 0' }}>
+          <p style={{ color: 'var(--text-success, #38a169)', fontSize: '13px', margin: '0 0 12px 0' }}>
             {success}
           </p>
         )}
@@ -124,7 +124,7 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
             style={{
               fontSize: '13px',
               fontWeight: 600,
-              color: '#a0aec0',
+              color: 'var(--text-secondary, #a0aec0)',
               textTransform: 'uppercase',
               letterSpacing: '0.05em',
               margin: '0 0 8px 0',
@@ -134,9 +134,9 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
           </h4>
 
           {loading ? (
-            <p style={{ fontSize: '13px', color: '#a0aec0', margin: 0 }}>Loading...</p>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary, #a0aec0)', margin: 0 }}>Loading...</p>
           ) : collaborators.length === 0 ? (
-            <p style={{ fontSize: '13px', color: '#a0aec0', margin: 0 }}>
+            <p style={{ fontSize: '13px', color: 'var(--text-secondary, #a0aec0)', margin: 0 }}>
               No collaborators yet
             </p>
           ) : (
@@ -149,12 +149,12 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '8px 0',
-                    borderBottom: '1px solid #edf2f7',
+                    borderBottom: '1px solid var(--border-color, #edf2f7)',
                   }}
                 >
                   <div>
-                    <span style={{ fontSize: '14px', color: '#2d3748' }}>{c.email}</span>
-                    <span style={{ fontSize: '11px', color: '#a0aec0', marginLeft: '8px' }}>
+                    <span style={{ fontSize: '14px', color: 'var(--text-primary, #1a202c)' }}>{c.email}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary, #a0aec0)', marginLeft: '8px' }}>
                       by {c.invitedByEmail}
                     </span>
                   </div>
@@ -164,7 +164,7 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
                       style={{
                         background: 'transparent',
                         border: 'none',
-                        color: '#e53e3e',
+                        color: 'var(--text-error, #e53e3e)',
                         cursor: 'pointer',
                         fontSize: '12px',
                         padding: '4px 8px',

@@ -24,6 +24,8 @@ import { HamburgerMenu } from './HamburgerMenu';
 import { SprintFlowLogo } from './SprintFlowLogo';
 import { ShareBoardDialog } from './ShareBoardDialog';
 import { LogOutButton } from './LogOutButton';
+import { UserAvatar } from './UserAvatar';
+import { ProfileModal } from './ProfileModal';
 import { WelcomeWidget } from './WelcomeWidget';
 import styles from './Board.module.css';
 import { updateCardPosition, addCard, deleteCard, duplicateCard, updateCard, getBoardData, deleteBoard, createBoard, renameBoard } from '@/app/actions/kanban';
@@ -59,9 +61,11 @@ interface KanbanContainerProps {
   initialData: BoardData;
   boards: BoardInfo[];
   currentBoardId: string;
+  userEmail?: string;
+  userCreatedAt?: string;
 }
 
-export function KanbanContainer({ initialData, boards, currentBoardId: initialBoardId }: KanbanContainerProps) {
+export function KanbanContainer({ initialData, boards, currentBoardId: initialBoardId, userEmail, userCreatedAt }: KanbanContainerProps) {
   const [data, setData] = useState<BoardData>(initialData);
   const [isMounted, setIsMounted] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -79,6 +83,7 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   const [isCreating, setIsCreating] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
@@ -541,12 +546,12 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             className={styles.desktopOnly}
             style={{
               background: 'transparent',
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--border-color, #e2e8f0)',
               borderRadius: '6px',
               padding: '4px 10px',
               fontSize: '12px',
               fontWeight: 500,
-              color: '#4a5568',
+              color: 'var(--text-secondary, #4a5568)',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -568,6 +573,11 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {userEmail && (
+            <div className={styles.desktopOnly}>
+              <UserAvatar email={userEmail} onClick={() => setShowProfileModal(true)} />
+            </div>
+          )}
           <div className={styles.desktopOnly}>
             <LogOutButton />
           </div>
@@ -580,6 +590,8 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             onShareClick={() => setShowShareDialog(true)}
             boardCount={currentBoards.length}
             activeBoardTitle={activeBoard?.title || ''}
+            userEmail={userEmail}
+            onAvatarClick={() => setShowProfileModal(true)}
           />
         </div>
       </header>
@@ -754,6 +766,15 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
             </div>
           </div>
         </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfileModal && userEmail && userCreatedAt && (
+        <ProfileModal
+          email={userEmail}
+          createdAt={userCreatedAt}
+          onClose={() => setShowProfileModal(false)}
+        />
       )}
     </>
   );
