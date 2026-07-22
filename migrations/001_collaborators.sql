@@ -152,6 +152,13 @@ BEGIN
 END;
 $$;
 
+-- Add email columns to board_collaborators for direct access
+ALTER TABLE public.board_collaborators
+ADD COLUMN IF NOT EXISTS user_email TEXT;
+
+ALTER TABLE public.board_collaborators
+ADD COLUMN IF NOT EXISTS invited_by_email TEXT;
+
 CREATE OR REPLACE FUNCTION public.get_users_emails(user_ids UUID[])
 RETURNS TABLE(user_id UUID, email TEXT)
 LANGUAGE plpgsql
@@ -160,5 +167,20 @@ SET search_path = ''
 AS $$
 BEGIN
   RETURN QUERY SELECT id, email FROM auth.users WHERE id = ANY(user_ids);
+END;
+$$;
+
+-- Single-user lookup matching proven get_user_id_by_email pattern
+CREATE OR REPLACE FUNCTION public.get_user_email_by_id(user_id UUID)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+  found_email TEXT;
+BEGIN
+  SELECT email::TEXT INTO found_email FROM auth.users WHERE id = user_id;
+  RETURN found_email;
 END;
 $$;

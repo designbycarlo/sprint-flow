@@ -2,6 +2,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styles from './Board.module.css';
 import { inviteCollaborator, removeCollaborator, getCollaborators } from '@/app/actions/kanban';
+import { UserAvatar } from './UserAvatar';
+
+function getDisplayName(email: string): string {
+  const local = email.split('@')[0];
+  return local.replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
 interface Collaborator {
   userId: string;
@@ -152,15 +158,20 @@ export function ShareBoardDialog({ boardId, isOwner, onClose }: ShareBoardDialog
                     borderBottom: '1px solid var(--border-color, #edf2f7)',
                   }}
                 >
-                  <div>
-                    <span style={{ fontSize: '14px', color: 'var(--text-primary, #1a202c)' }}>{c.email}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-secondary, #a0aec0)', marginLeft: '8px' }}>
-                      by {c.invitedByEmail}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <UserAvatar email={c.email} />
+                    <div>
+                      <span style={{ fontSize: '14px', color: 'var(--text-primary, #1a202c)' }}>{getDisplayName(c.email)}</span>
+                      {c.invitedByEmail && (
+                        <span style={{ fontSize: '11px', color: 'var(--text-secondary, #a0aec0)', marginLeft: '8px' }}>
+                          by {getDisplayName(c.invitedByEmail)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {isOwner && (
                     <button
-                      onClick={() => handleRemove(c.userId, c.email)}
+                      onClick={() => handleRemove(c.userId, getDisplayName(c.email))}
                       style={{
                         background: 'transparent',
                         border: 'none',

@@ -327,6 +327,8 @@ export async function inviteCollaborator(boardId: string, email: string) {
       board_id: boardId,
       user_id: targetUserId,
       invited_by: user.id,
+      user_email: trimmedEmail,
+      invited_by_email: user.email,
     })
 
   if (insertError) {
@@ -370,7 +372,7 @@ export async function getCollaborators(boardId: string) {
 
   const { data, error } = await supabase
     .from('board_collaborators')
-    .select('user_id, invited_by, created_at')
+    .select('user_id, invited_by, created_at, user_email, invited_by_email')
     .eq('board_id', boardId)
 
   if (error) {
@@ -380,38 +382,60 @@ export async function getCollaborators(boardId: string) {
 
   if (!data || data.length === 0) return []
 
-  // Batch fetch all user emails
-  const userIds = data.map(c => c.user_id)
-  const { data: emailsData } = await supabase
-    .rpc('get_users_emails', { user_ids: userIds })
+  const userIdsToLookup = new Set<string>()
+
+  for (const c of data) {
+    if (!c.user_email) userIdsToLookup.add(c.user_id)
+    if (!c.invited_by_email && c.invited_by) userIdsToLookup.add(c.invited_by)
+  }
 
   const emailMap: Record<string, string> = {}
-  if (emailsData) {
-    for (const row of emailsData) {
-      emailMap[row.user_id] = row.email
+  if (userIdsToLookup.size > 0) {
+    const ids = [...userIdsToLookup]
+    const { data: jsonData } = await supabase
+      .rpc('get_users_emails_json', { user_ids: JSON.stringify(ids) })
+    if (jsonData && jsonData.length > 0) {
+      for (const row of jsonData) {
+        emailMap[row.user_id] = row.email
+      }
+    } else {
+      const { data: arrayData } = await supabase
+        .rpc('get_users_emails', { user_ids: ids })
+      if (arrayData && arrayData.length > 0) {
+        for (const row of arrayData) {
+          emailMap[row.user_id] = row.email
+        }
+      } else {
+        const results = await Promise.allSettled(
+          ids.map(id =>
+            supabase.rpc('get_user_email_by_id', { user_id: id })
+              .then(r => ({ id, email: r.data }))
+          )
+        )
+        for (const r of results) {
+          if (r.status === 'fulfilled' && r.value.email) {
+            emailMap[r.value.id] = r.value.email as unknown as string
+          }
+        }
+      }
     }
   }
 
-  // Also get the inviting users' emails for display
-  const inviterIds = data.map(c => c.invited_by).filter(Boolean) as string[]
-  const { data: inviterData } = inviterIds.length > 0
-    ? await supabase.rpc('get_users_emails', { user_ids: inviterIds })
-    : { data: null }
+  return data.map(c => {
+    const email = (c.user_email as string) || emailMap[c.user_id] || ''
+    const inviterEmail = (c.invited_by_email as string) ||
+      (c.invited_by === user.id && user.email ? user.email : '') ||
+      emailMap[c.invited_by] ||
+      ''
 
-  const inviterMap: Record<string, string> = {}
-  if (inviterData) {
-    for (const row of inviterData) {
-      inviterMap[row.user_id] = row.email
+    return {
+      userId: c.user_id,
+      email: email || 'Invited user',
+      invitedBy: c.invited_by,
+      invitedByEmail: inviterEmail || '',
+      createdAt: c.created_at,
     }
-  }
-
-  return data.map(c => ({
-    userId: c.user_id,
-    email: emailMap[c.user_id] || 'Unknown',
-    invitedBy: c.invited_by,
-    invitedByEmail: inviterMap[c.invited_by] || 'Unknown',
-    createdAt: c.created_at,
-  }))
+  })
 }
 
 export async function getBoardsForUser() {
