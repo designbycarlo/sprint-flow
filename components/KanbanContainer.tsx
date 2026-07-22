@@ -387,7 +387,12 @@ export function KanbanContainer({ initialData, boards, currentBoardId: initialBo
   };
 
   const handleBoardCreated = async (newBoard: BoardInfo) => {
-    setCurrentBoards(prev => [...prev, newBoard]);
+    const normalized: BoardInfo = {
+      ...newBoard,
+      is_owner: true,
+      owner_id: newBoard.owner_id || (newBoard as any).user_id || '',
+    }
+    setCurrentBoards(prev => [...prev, normalized]);
     setIsSwitching(true);
     try {
       const cached = getCachedBoard(newBoard.id);
