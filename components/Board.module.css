@@ -689,7 +689,7 @@ header.app-header .desktopOnly > :global(form) {
 }
 
 .hamburgerItem:hover {
-  background: #f7fafc;
+  background: #edf2f7;
 }
 
 [data-theme="dark"] .hamburgerItem {
@@ -701,12 +701,12 @@ header.app-header .desktopOnly > :global(form) {
 }
 
 .hamburgerItemActive {
-  background: #edf2f7;
+  background: #e2e8f0;
   font-weight: 600;
 }
 
 [data-theme="dark"] .hamburgerItemActive {
-  background: #4a5568;
+  background: #5a6a7a;
   color: #f7fafc;
 }
 
@@ -934,7 +934,7 @@ header.app-header .desktopOnly > :global(form) {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   min-width: 180px;
-  padding: 6px 0;
+  padding: 6px;
   animation: fadeIn 0.12s ease;
 }
 
@@ -949,7 +949,7 @@ header.app-header .desktopOnly > :global(form) {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 9px 14px;
+  padding: 9px 12px;
   border: none;
   background: transparent;
   color: #2d3748;
@@ -957,6 +957,7 @@ header.app-header .desktopOnly > :global(form) {
   text-align: left;
   font-size: 13px;
   font-family: inherit;
+  border-radius: 8px;
   transition: background 0.1s ease;
 }
 
@@ -965,7 +966,7 @@ header.app-header .desktopOnly > :global(form) {
 }
 
 .fileMenuItem:hover {
-  background: #f7fafc;
+  background: #edf2f7;
 }
 
 [data-theme="dark"] .fileMenuItem:hover {
@@ -1211,9 +1212,9 @@ header.app-header .desktopOnly > :global(form) {
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   z-index: 1000;
-  min-width: 200px;
-  max-width: 300px;
-  padding: 6px 0;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 6px;
   animation: fadeIn 0.12s ease;
 }
 
@@ -1228,7 +1229,7 @@ header.app-header .desktopOnly > :global(form) {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 9px 14px;
+  padding: 9px 12px;
   border: none;
   background: transparent;
   color: #2d3748;
@@ -1236,6 +1237,7 @@ header.app-header .desktopOnly > :global(form) {
   text-align: left;
   font-size: 13px;
   font-family: inherit;
+  border-radius: 8px;
   transition: background 0.1s ease;
 }
 
@@ -1244,7 +1246,7 @@ header.app-header .desktopOnly > :global(form) {
 }
 
 .projectSwitcherItem:hover {
-  background: #f7fafc;
+  background: #edf2f7;
 }
 
 [data-theme="dark"] .projectSwitcherItem:hover {
@@ -1252,12 +1254,12 @@ header.app-header .desktopOnly > :global(form) {
 }
 
 .projectSwitcherItemActive {
-  background: #edf2f7;
+  background: #e2e8f0;
   font-weight: 600;
 }
 
 [data-theme="dark"] .projectSwitcherItemActive {
-  background: #4a5568;
+  background: #5a6a7a;
   color: #f7fafc;
 }
 
