@@ -794,6 +794,24 @@ header.app-header .desktopOnly > :global(form) {
     height: 34px;
   }
 
+  .projectSwitcherContainer {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .projectSwitcherBtn {
+    max-width: 100%;
+    font-size: 14px;
+    padding: 4px 6px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .projectSwitcherTitle {
+    max-width: 100%;
+  }
+
   .cardDescBtn {
     padding: 4px 6px;
   }
